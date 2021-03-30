@@ -50,7 +50,7 @@ public class MainActivity extends AppCompatActivity implements OnDeviceListener 
     @Override
     public void onConnected() {
         Log.e("onConnected",""+ (Looper.getMainLooper().getThread() == Thread.currentThread()));
-        tv_status.setText("已连接");
+        tv_status.setText("已连接1");
     }
 
     @Override
