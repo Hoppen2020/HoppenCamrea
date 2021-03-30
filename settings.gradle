@@ -1,0 +1,3 @@
+include ':cameralib'
+include ':app'
+rootProject.name = "CamreaDemo"

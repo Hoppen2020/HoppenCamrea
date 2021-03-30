@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
+<usb>
+    <!-- deviceType 值：1 : mcu  单片机 -->
+    <!-- deviceType 值：2 : camare  相机 -->
+    <usb-device vendorId="6790" productId="29987"  deviceType="1" />
+    <usb-device vendorId="1423" productId="14433" deviceType = "2" />
+    <usb-device vendorId="2760" productId="22136" deviceType = "2" />
+    <!--    <usb-device vendorId="6790" productId="29987"  />-->
+    <!--<usb-device class="239" subclass="2" /> --> <!-- all device of UVC -->
+</usb>
