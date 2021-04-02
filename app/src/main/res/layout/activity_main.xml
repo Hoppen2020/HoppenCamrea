@@ -37,22 +37,28 @@
             android:gravity="center"
             />
         <Button
+            android:id="@+id/btn_rgb"
             android:layout_marginTop="10dp"
-            android:layout_width="100dp"
+            android:layout_width="120dp"
             android:layout_height="60dp"
             android:text="RGB"
+            android:onClick="onClick"
             />
         <Button
+            android:id="@+id/btn_uv"
             android:layout_marginTop="10dp"
-            android:layout_width="100dp"
+            android:layout_width="120dp"
             android:layout_height="60dp"
             android:text="UV"
+            android:onClick="onClick"
             />
         <Button
+            android:id="@+id/btn_polarized"
             android:layout_marginTop="10dp"
-            android:layout_width="100dp"
+            android:layout_width="120dp"
             android:layout_height="60dp"
-            android:text="polarized "
+            android:text="polarized"
+            android:onClick="onClick"
             />
 
 

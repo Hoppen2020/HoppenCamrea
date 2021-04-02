@@ -14,9 +14,6 @@ import java.util.List;
 public class HoppenController implements Controller{
     private CameraDevice cameraDevice;
     private McuDevice mcuDevice;
-    private int type;
-    private String typeName;
-    private boolean isAuto;
 
     public HoppenController(UsbManager usbManager){
         cameraDevice = new CameraDevice(usbManager);
@@ -75,6 +72,11 @@ public class HoppenController implements Controller{
     @Override
     public boolean sendInstructions(Instruction instruction) {
         return mcuDevice.sendInstructions(instruction);
+    }
+
+    @Override
+    public String getDeviceName() {
+        return cameraDevice.getCameraName();
     }
 
     public void setWaterListener(OnWaterListener onWaterListener){

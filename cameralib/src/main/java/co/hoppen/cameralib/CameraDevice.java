@@ -24,6 +24,7 @@ public class CameraDevice extends HoppenDevice implements IButtonCallback {
     private int width = DEFAULT_WIDTH,height = DEFAULT_HEIGHT;
     private final static int DEFAULT_WIDTH = 800;
     private final static int DEFAULT_HEIGHT = 600;
+    private String cameraName = "";
 
     public CameraDevice(UsbManager usbManager){
         this.usbManager = usbManager;
@@ -50,6 +51,7 @@ public class CameraDevice extends HoppenDevice implements IButtonCallback {
             }
         }
         createPreviewSize(usbDevice.getProductName());
+        cameraName = usbDevice.getProductName();
         if (controlBlock==null){
             controlBlock = new ControlBlock(usbManager,usbDevice);
             if (controlBlock.open()!=null){
@@ -67,7 +69,8 @@ public class CameraDevice extends HoppenDevice implements IButtonCallback {
 
     @Override
     public void onDisconnect(UsbDevice usbDevice, DeviceType type) {
-        if (deviceName!=null&&deviceName.equals(usbDevice.getDeviceName())){
+        if (deviceName!= null && deviceName.equals(usbDevice.getDeviceName())){
+            cameraName = "";
             this.closeDevice();
         }
     }
@@ -157,4 +160,7 @@ public class CameraDevice extends HoppenDevice implements IButtonCallback {
         }
     }
 
+    public String getCameraName() {
+        return cameraName==null?"":cameraName;
+    }
 }
