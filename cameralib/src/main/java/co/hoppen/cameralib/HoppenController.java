@@ -71,7 +71,9 @@ public class HoppenController implements Controller{
 
     @Override
     public boolean sendInstructions(Instruction instruction) {
-        return mcuDevice.sendInstructions(instruction);
+        if (cameraDevice.isSpecialDevice()){
+            return cameraDevice.sendInstructions(instruction);
+        }else return mcuDevice.sendInstructions(instruction);
     }
 
     @Override

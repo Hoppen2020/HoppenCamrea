@@ -8,6 +8,12 @@ import android.util.Log;
 import android.view.View;
 import android.widget.TextView;
 
+import com.serenegiant.usb.Size;
+
+import java.lang.reflect.Array;
+import java.util.Arrays;
+import java.util.List;
+
 import co.hoppen.cameralib.HoppenCameraHelper;
 import co.hoppen.cameralib.HoppenController;
 import co.hoppen.cameralib.Instruction;
@@ -63,6 +69,11 @@ public class MainActivity extends AppCompatActivity implements OnDeviceListener 
         switch (view.getId()){
             case R.id.btn_polarized:
                 controller.sendInstructions(Instruction.LIGHT_POLARIZED);
+//                Log.e("1","1");
+//                List<Size> supportedPreviewSizes = controller.getSupportedPreviewSizes();
+//                for (Size s :supportedPreviewSizes){
+//                    Log.e("",""+s.width+"   "+ s.height);
+//                }
                 break;
             case R.id.btn_uv:
                 controller.sendInstructions(Instruction.LIGHT_UV);

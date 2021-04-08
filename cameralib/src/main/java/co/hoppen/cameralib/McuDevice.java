@@ -138,6 +138,7 @@ public class McuDevice extends HoppenDevice{
         return mode;
     }
 
+    @Override
     public void setOnWaterListener(OnWaterListener onWaterListener) {
         this.onWaterListener = onWaterListener;
     }
@@ -150,24 +151,6 @@ public class McuDevice extends HoppenDevice{
     }
 
     @Override
-    protected void closeDevice() {
-        if (usbDeviceConnection!=null){
-            try {
-                if (deviceName!=null){
-                    if (disposable!=null)disposable.dispose();
-                    usbDeviceConnection.releaseInterface(usbInterface);
-                    usbDeviceConnection.close();
-                    usbDeviceConnection=null;
-                    usbInterface = null;
-                    epOut = null;
-                    epIn = null;
-                    deviceName = null;
-                }
-            }catch (Exception e){
-            }
-        }
-    }
-
     public boolean sendInstructions(Instruction instruction){
         if (currentMode==MODE_NONE)return false;
         if (currentMode==MODE_SINGLE && instruction!=Instruction.WATER){
@@ -199,8 +182,29 @@ public class McuDevice extends HoppenDevice{
                         UsbInstructionUtils.USB_CAMERA_WATER_SINGLE_MODE();
                 break;
         }
-       return sendInstructions(bytes);
+        return sendInstructions(bytes);
     }
+
+    @Override
+    protected void closeDevice() {
+        if (usbDeviceConnection!=null){
+            try {
+                if (deviceName!=null){
+                    if (disposable!=null)disposable.dispose();
+                    usbDeviceConnection.releaseInterface(usbInterface);
+                    usbDeviceConnection.close();
+                    usbDeviceConnection=null;
+                    usbInterface = null;
+                    epOut = null;
+                    epIn = null;
+                    deviceName = null;
+                }
+            }catch (Exception e){
+            }
+        }
+    }
+
+
 
     private synchronized boolean sendInstructions(byte [] data,int timeOut){
         boolean success = false;

@@ -28,6 +28,8 @@ import android.text.TextUtils;
 import android.view.Surface;
 import android.view.SurfaceHolder;
 
+import com.blankj.utilcode.util.LogUtils;
+
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -204,6 +206,7 @@ public class UVCCamera {
         }
         if (mNativePtr != 0 && TextUtils.isEmpty(mSupportedSize)) {
             mSupportedSize = nativeGetSupportedSize(mNativePtr);
+            LogUtils.e(mSupportedSize);
         }
         nativeSetPreviewSize(mNativePtr, DEFAULT_PREVIEW_WIDTH, DEFAULT_PREVIEW_HEIGHT,
                 DEFAULT_PREVIEW_MIN_FPS, DEFAULT_PREVIEW_MAX_FPS, DEFAULT_PREVIEW_MODE, DEFAULT_BANDWIDTH);

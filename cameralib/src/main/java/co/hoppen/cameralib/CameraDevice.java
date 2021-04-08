@@ -2,6 +2,7 @@ package co.hoppen.cameralib;
 
 import android.hardware.usb.UsbDevice;
 import android.hardware.usb.UsbManager;
+import android.util.Log;
 import android.view.Surface;
 
 import com.blankj.utilcode.util.LogUtils;
@@ -9,7 +10,12 @@ import com.serenegiant.usb.IButtonCallback;
 import com.serenegiant.usb.Size;
 import com.serenegiant.usb.UVCCamera;
 
+import java.util.Arrays;
 import java.util.List;
+
+import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers;
+import io.reactivex.rxjava3.core.Observable;
+import io.reactivex.rxjava3.functions.Consumer;
 
 /**
  * Created by YangJianHui on 2021/3/16.
@@ -22,9 +28,11 @@ public class CameraDevice extends HoppenDevice implements IButtonCallback {
     private String deviceName;
     private OnButtonListener onDeviceButton;
     private int width = DEFAULT_WIDTH,height = DEFAULT_HEIGHT;
-    private final static int DEFAULT_WIDTH = 800;
-    private final static int DEFAULT_HEIGHT = 600;
+    private final static int DEFAULT_WIDTH = 640;
+    private final static int DEFAULT_HEIGHT = 480;
     private String cameraName = "";
+    private boolean specialDevice = false;
+    private OnWaterListener onWaterListener;
 
     public CameraDevice(UsbManager usbManager){
         this.usbManager = usbManager;
@@ -101,6 +109,58 @@ public class CameraDevice extends HoppenDevice implements IButtonCallback {
     }
 
     @Override
+    protected boolean sendInstructions(Instruction instruction) {
+        if (!specialDevice && uvcCamera!=null)return false;
+        int writeCmd = 0x82;
+        int readCmd = 0xc2;
+        int writeAddr = 0xd55b;
+        int readAddr = 0xd55c;
+        int send = -1;
+        byte [] pdat = new byte[4];
+        pdat[0] = 0x0;	// 0 for write, 1 for read
+        pdat[1] = 0x78;	// slave id (same for read and write)
+        pdat[2] = 0;
+        pdat[3] = 0;
+        switch (instruction){
+            case LIGHT_CLOSE:
+                pdat[2] = 0x10;
+                pdat[3] = 0x00;
+                send = uvcCamera.nativeXuWrite(writeCmd,writeAddr,pdat.length,pdat);
+                break;
+            case LIGHT_UV:
+                pdat[2] = 0x13;
+                pdat[3] = (byte) 0xff;
+                send = uvcCamera.nativeXuWrite(writeCmd,writeAddr,pdat.length,pdat);
+                break;
+            case LIGHT_RGB:
+                pdat[2] = 0x11;
+                pdat[3] = (byte) 0xff;
+                send = uvcCamera.nativeXuWrite(writeCmd,writeAddr,pdat.length,pdat);
+                break;
+            case LIGHT_POLARIZED:
+                pdat[2] = 0x12;
+                pdat[3] = (byte) 0xff;
+                send = uvcCamera.nativeXuWrite(writeCmd,writeAddr,pdat.length,pdat);
+                break;
+            case WATER:
+                pdat[0] = 0x1;	// 0 for write, 1 for read
+                pdat[2] = 0x79;
+                pdat[3] = 0;
+                uvcCamera.nativeXuWrite(writeCmd, writeAddr, 4, pdat);
+                uvcCamera.nativeXuRead(readCmd, readAddr, 3, pdat);
+//                Log.e("测试测试",""+ Arrays.toString(pdat));
+                LogUtils.e("new camera" +  Arrays.toString(pdat));
+                break;
+        }
+        return send!=-1;
+    }
+
+    @Override
+    protected void setOnWaterListener(OnWaterListener onWaterListener) {
+        this.onWaterListener = onWaterListener;
+    }
+
+    @Override
     protected void closeDevice() {
         try {
             if (deviceName!=null){
@@ -121,7 +181,9 @@ public class CameraDevice extends HoppenDevice implements IButtonCallback {
 
     @Override
     public void onButton(int button, int state) {
-        if (onDeviceButton!=null)onDeviceButton.onButton(state);
+        if (onDeviceButton!=null){
+            Observable.just(state).observeOn(AndroidSchedulers.mainThread()).subscribe(integer -> onDeviceButton.onButton(state));
+        }
     }
 
     public void setOnDeviceButton(OnButtonListener onDeviceButton) {
@@ -132,6 +194,7 @@ public class CameraDevice extends HoppenDevice implements IButtonCallback {
         try {
             return uvcCamera.getSupportedSizeList();
         }catch (Exception e){
+//            LogUtils.e(e.getMessage());
         }
         return null;
     }
@@ -150,7 +213,7 @@ public class CameraDevice extends HoppenDevice implements IButtonCallback {
             height = 600;
         }else if (productName.equals("WAX-PF4D3-MK")){
             width = 1280;
-            height = 720;
+            height = 1024;
         }else if (productName.equals("WAX-PF4D2-SX")){
             width = 800;
             height = 600;
@@ -162,5 +225,10 @@ public class CameraDevice extends HoppenDevice implements IButtonCallback {
 
     public String getCameraName() {
         return cameraName==null?"":cameraName;
+    }
+
+
+    public boolean isSpecialDevice() {
+        return specialDevice;
     }
 }
