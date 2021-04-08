@@ -50,7 +50,6 @@ public class CameraDevice extends HoppenDevice implements IButtonCallback {
 
     @Override
     public void onConnecting(UsbDevice usbDevice, DeviceType type) {
-//        LogUtils.e(usbDevice);
         if (deviceName==null){
             deviceName = usbDevice.getDeviceName();
         }else {
@@ -194,7 +193,6 @@ public class CameraDevice extends HoppenDevice implements IButtonCallback {
         try {
             return uvcCamera.getSupportedSizeList();
         }catch (Exception e){
-//            LogUtils.e(e.getMessage());
         }
         return null;
     }
