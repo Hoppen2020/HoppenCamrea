@@ -28,8 +28,8 @@ public class CameraDevice extends HoppenDevice implements IButtonCallback {
     private String deviceName;
     private OnButtonListener onDeviceButton;
     private int width = DEFAULT_WIDTH,height = DEFAULT_HEIGHT;
-    private final static int DEFAULT_WIDTH = 640;
-    private final static int DEFAULT_HEIGHT = 480;
+    private final static int DEFAULT_WIDTH = 800;
+    private final static int DEFAULT_HEIGHT = 600;
     private String cameraName = "";
     private boolean specialDevice = false;
     private OnWaterListener onWaterListener;
