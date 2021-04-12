@@ -52,12 +52,7 @@ public class McuDevice extends HoppenDevice{
                             float water = decodingWater(data);
                             if (water>=0){
                                 //LogUtils.e(water);
-                                Observable.just(water).observeOn(AndroidSchedulers.mainThread()).subscribe(new Consumer<Float>() {
-                                    @Override
-                                    public void accept(Float aFloat) throws Throwable {
-                                        onWaterListener.onWaterCallback(aFloat.floatValue());
-                                    }
-                                });
+                                waterForMainThread(water);
                             }
                         }
                     }
@@ -69,9 +64,16 @@ public class McuDevice extends HoppenDevice{
     };
 
 
+
     public McuDevice(UsbManager usbManager){
         this.usbManager = usbManager;
     }
+
+    private void waterForMainThread(float water){
+        Observable.just(water).observeOn(AndroidSchedulers.mainThread()).subscribe(aFloat ->
+                onWaterListener.onWaterCallback(aFloat.floatValue()));
+    }
+
 
     @Override
     public synchronized void onConnecting(UsbDevice usbDevice, DeviceType type) {
@@ -152,9 +154,12 @@ public class McuDevice extends HoppenDevice{
 
     @Override
     public boolean sendInstructions(Instruction instruction){
-        if (currentMode==MODE_NONE)return false;
-        if (currentMode==MODE_SINGLE && instruction!=Instruction.WATER){
-            return false;
+        if ((currentMode==MODE_NONE || currentMode==MODE_SINGLE)
+                &&
+                instruction != Instruction.WATER) return false;
+        if (currentMode==MODE_NONE && instruction == Instruction.WATER){
+            waterForMainThread(-1);
+            return true;
         }
         byte [] bytes = null;
         switch (instruction){

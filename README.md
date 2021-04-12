@@ -44,6 +44,8 @@ controller.sendInstructions(Instruction);
 ```
 ***指令***
 
+`water返回值说明:-1（没有此装置） 0（没有接触皮肤）`
+
 |指令|说明|
 |---|:---:|
 |LIGHT_RGB|rgb灯光|
