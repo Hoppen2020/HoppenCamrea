@@ -10,7 +10,7 @@ allprojects {
 ```
 ```
 dependencies {
-    implementation 'com.github.Hoppen2020:HoppenCamrea:1.0.0'
+    implementation 'com.github.Hoppen2020:HoppenCamrea:1.0.1'
 }
 ```
 #### 使用
