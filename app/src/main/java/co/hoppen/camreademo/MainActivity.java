@@ -81,4 +81,9 @@ public class MainActivity extends AppCompatActivity implements OnDeviceListener 
                 break;
         }
     }
+
+    @Override
+    protected void onStop() {
+        super.onStop();
+    }
 }

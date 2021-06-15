@@ -45,19 +45,17 @@ public class McuDevice extends HoppenDevice{
                 try {
                     byte[] bytes = readData();
                     if (bytes!=null){
-                        //LogUtils.e(new String(bytes),Arrays.toString(bytes));
+                        LogUtils.e(Arrays.toString(bytes));
                         String data = decodingData(bytes);
-//                        LogUtils.e(data);
+                        LogUtils.e(data);
                         if (onWaterListener!=null){
                             float water = decodingWater(data);
                             if (water>=0){
-                                //LogUtils.e(water);
                                 waterForMainThread(water);
                             }
                         }
                     }
                 }catch (Exception e){
-                    //LogUtils.e(e.getMessage());
                 }
             }
         }
@@ -77,7 +75,6 @@ public class McuDevice extends HoppenDevice{
 
     @Override
     public synchronized void onConnecting(UsbDevice usbDevice, DeviceType type) {
-//        LogUtils.e(1 + "  "+usbDevice.getDeviceName(),TimeUtils.getNowString());
         if (deviceName==null){
             deviceName = usbDevice.getDeviceName();
         }else {
@@ -115,10 +112,8 @@ public class McuDevice extends HoppenDevice{
                     currentMode = discernMode(UsbInstructionUtils.USB_CAMERA_WATER_SINGLE_MODE());
                 }
                 if (currentMode == MODE_NONE)closeDevice();
-//                LogUtils.e("mode  "+currentMode);
-                //-----------
-                readDataThread = new Thread(readRunnable);
-                readDataThread.start();
+                    readDataThread = new Thread(readRunnable);
+                    readDataThread.start();
             }
         }
 
@@ -208,8 +203,6 @@ public class McuDevice extends HoppenDevice{
             }
         }
     }
-
-
 
     private synchronized boolean sendInstructions(byte [] data,int timeOut){
         boolean success = false;
