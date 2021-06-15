@@ -69,17 +69,15 @@ public class MainActivity extends AppCompatActivity implements OnDeviceListener 
         switch (view.getId()){
             case R.id.btn_polarized:
                 controller.sendInstructions(Instruction.LIGHT_POLARIZED);
-//                Log.e("1","1");
-//                List<Size> supportedPreviewSizes = controller.getSupportedPreviewSizes();
-//                for (Size s :supportedPreviewSizes){
-//                    Log.e("",""+s.width+"   "+ s.height);
-//                }
                 break;
             case R.id.btn_uv:
                 controller.sendInstructions(Instruction.LIGHT_UV);
                 break;
             case R.id.btn_rgb:
                 controller.sendInstructions(Instruction.LIGHT_RGB);
+                break;
+            case R.id.btn_close:
+                controller.sendInstructions(Instruction.LIGHT_CLOSE);
                 break;
         }
     }

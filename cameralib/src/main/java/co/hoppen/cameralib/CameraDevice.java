@@ -143,12 +143,13 @@ public class CameraDevice extends HoppenDevice implements IButtonCallback {
                 break;
             case WATER:
                 pdat[0] = 0x1;	// 0 for write, 1 for read
-                pdat[2] = 0x79;
-                pdat[3] = 0;
+                pdat[1] = 0x79;
+                pdat[2] = 0;
                 uvcCamera.nativeXuWrite(writeCmd, writeAddr, 4, pdat);
                 uvcCamera.nativeXuRead(readCmd, readAddr, 3, pdat);
 //                Log.e("测试测试",""+ Arrays.toString(pdat));
                 LogUtils.e("new camera" +  Arrays.toString(pdat));
+//                onWaterListener.
                 break;
         }
         return send!=-1;
@@ -206,6 +207,7 @@ public class CameraDevice extends HoppenDevice implements IButtonCallback {
     }
 
     private void createPreviewSize(String productName){
+        LogUtils.e(productName);
         if (productName.equals("WAX-04+80")){
             width = 800;
             height = 600;
@@ -213,11 +215,13 @@ public class CameraDevice extends HoppenDevice implements IButtonCallback {
             width = 1280;
             height = 1024;
         }else if (productName.equals("WAX-PF4D2-SX")){
-            width = 800;
-            height = 600;
+            width = 640;
+            height = 480;
+            specialDevice = true;
         }else if (productName.equals("WAX-PF4D3-SX")){
-            width = 800;
-            height = 600;
+            width = 640;
+            height = 480;
+            specialDevice = true;
         }
     }
 
