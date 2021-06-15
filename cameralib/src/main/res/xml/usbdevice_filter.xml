@@ -6,6 +6,7 @@
     <usb-device vendorId="1423" productId="14433" deviceType = "2" />
     <usb-device vendorId="2760" productId="22136" deviceType = "2" />
     <usb-device vendorId="1679" productId="14434" deviceType = "2" />
+    <usb-device vendorId="3141" productId="25446" deviceType = "2" />
     <!--    <usb-device vendorId="6790" productId="29987"  />-->
     <!--<usb-device class="239" subclass="2" /> --> <!-- all device of UVC -->
 </usb>
