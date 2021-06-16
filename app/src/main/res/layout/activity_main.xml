@@ -69,6 +69,33 @@
             android:onClick="onClick"
             />
 
+        <Button
+            android:id="@+id/btn_id"
+            android:layout_marginTop="10dp"
+            android:layout_width="120dp"
+            android:layout_height="60dp"
+            android:text="id"
+            android:onClick="onClick"
+            />
+
+        <Button
+            android:id="@+id/btn_water"
+            android:layout_marginTop="10dp"
+            android:layout_width="120dp"
+            android:layout_height="60dp"
+            android:text="water"
+            android:onClick="onClick"
+            />
+
+        <TextView
+            android:id="@+id/tv_id"
+            android:layout_width="150dp"
+            android:layout_height="wrap_content"
+            android:textSize="20sp"
+            android:textColor="@color/black"
+            android:text=""
+            />
+
     </LinearLayout>
 
 

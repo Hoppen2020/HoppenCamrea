@@ -8,5 +8,6 @@ import android.hardware.usb.UsbDevice;
 public abstract class HoppenDevice implements OnUsbStatusListener{
     protected abstract boolean sendInstructions(Instruction instruction);
     protected abstract void setOnWaterListener(OnWaterListener onWaterListener);
+    protected abstract void setOnInfoListener(OnInfoListener onInfoListener);
     protected abstract void closeDevice();
 }

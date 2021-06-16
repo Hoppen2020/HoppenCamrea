@@ -11,4 +11,5 @@ public enum Instruction {
     LIGHT_CLOSE,
     SYS_ONLINE,
     WATER,
+    UNIQUE_CODE
 }

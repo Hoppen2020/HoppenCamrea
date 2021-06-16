@@ -82,12 +82,12 @@ public class HoppenController implements Controller{
     }
 
     public void setWaterListener(OnWaterListener onWaterListener){
-        if (cameraDevice.isSpecialDevice()){
-            cameraDevice.setOnWaterListener(onWaterListener);
-        }else  {
-            mcuDevice.setOnWaterListener(onWaterListener);
-        }
-
+        cameraDevice.setOnWaterListener(onWaterListener);
+        mcuDevice.setOnWaterListener(onWaterListener);
     }
 
+    public void setInfoListener(OnInfoListener onInfoListener){
+        cameraDevice.setOnInfoListener(onInfoListener);
+        mcuDevice.setOnInfoListener(onInfoListener);
+    }
 }

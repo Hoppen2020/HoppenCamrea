@@ -141,6 +141,11 @@ public class McuDevice extends HoppenDevice{
     }
 
     @Override
+    protected void setOnInfoListener(OnInfoListener onInfoListener) {
+
+    }
+
+    @Override
     public synchronized void onDisconnect(UsbDevice usbDevice, DeviceType type) {
         if (deviceName!=null && deviceName.equals(usbDevice.getDeviceName())){
             this.closeDevice();

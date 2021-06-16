@@ -2,7 +2,6 @@ package co.hoppen.cameralib;
 
 import android.hardware.usb.UsbDevice;
 import android.hardware.usb.UsbManager;
-import android.util.Log;
 import android.view.Surface;
 
 import com.blankj.utilcode.util.LogUtils;
@@ -15,7 +14,6 @@ import java.util.List;
 
 import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers;
 import io.reactivex.rxjava3.core.Observable;
-import io.reactivex.rxjava3.functions.Consumer;
 
 /**
  * Created by YangJianHui on 2021/3/16.
@@ -33,6 +31,7 @@ public class CameraDevice extends HoppenDevice implements IButtonCallback {
     private String cameraName = "";
     private boolean specialDevice = false;
     private OnWaterListener onWaterListener;
+    private OnInfoListener onInfoListener;
 
     public CameraDevice(UsbManager usbManager){
         this.usbManager = usbManager;
@@ -50,6 +49,7 @@ public class CameraDevice extends HoppenDevice implements IButtonCallback {
 
     @Override
     public void onConnecting(UsbDevice usbDevice, DeviceType type) {
+        //LogUtils.e(usbDevice.toString());
         if (deviceName==null){
             deviceName = usbDevice.getDeviceName();
         }else {
@@ -147,9 +147,22 @@ public class CameraDevice extends HoppenDevice implements IButtonCallback {
                 pdat[2] = 0;
                 uvcCamera.nativeXuWrite(writeCmd, writeAddr, 4, pdat);
                 uvcCamera.nativeXuRead(readCmd, readAddr, 3, pdat);
-//                Log.e("测试测试",""+ Arrays.toString(pdat));
                 LogUtils.e("new camera" +  Arrays.toString(pdat));
-//                onWaterListener.
+                break;
+            case UNIQUE_CODE:
+                pdat = new byte[12];
+                uvcCamera.nativeXuRead(0x02c2, 0xFE00, pdat.length, pdat);
+                LogUtils.e(Arrays.toString(pdat));
+                LogUtils.e(new String(pdat));
+//                byte[] a = ConvertUtils.string2Bytes("SXB0100001");
+//                LogUtils.e(new String(a));
+//                LogUtils.e(Arrays.toString(a));
+//                LogUtils.e(ConvertUtils.bytes2String(a));
+                if (onInfoListener!=null){
+                    Observable.just(new String(pdat)).observeOn(AndroidSchedulers.mainThread()).subscribe(info ->
+                                onInfoListener.onInfoCallback(instruction, info)
+                            );
+                }
                 break;
         }
         return send!=-1;
@@ -158,6 +171,11 @@ public class CameraDevice extends HoppenDevice implements IButtonCallback {
     @Override
     protected void setOnWaterListener(OnWaterListener onWaterListener) {
         this.onWaterListener = onWaterListener;
+    }
+
+    @Override
+    protected void setOnInfoListener(OnInfoListener onInfoListener) {
+        this.onInfoListener = onInfoListener;
     }
 
     @Override

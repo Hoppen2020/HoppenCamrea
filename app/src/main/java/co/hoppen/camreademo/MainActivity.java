@@ -8,17 +8,12 @@ import android.util.Log;
 import android.view.View;
 import android.widget.TextView;
 
-import com.serenegiant.usb.Size;
-
-import java.lang.reflect.Array;
-import java.util.Arrays;
-import java.util.List;
-
 import co.hoppen.cameralib.HoppenCameraHelper;
 import co.hoppen.cameralib.HoppenController;
 import co.hoppen.cameralib.Instruction;
 import co.hoppen.cameralib.OnButtonListener;
 import co.hoppen.cameralib.OnDeviceListener;
+import co.hoppen.cameralib.OnInfoListener;
 import co.hoppen.cameralib.OnWaterListener;
 import co.hoppen.cameralib.widget.UVCCameraTextureView;
 
@@ -51,7 +46,14 @@ public class MainActivity extends AppCompatActivity implements OnDeviceListener 
                 tv_water.setText(""+water);
             }
         });
-
+        controller.setInfoListener(new OnInfoListener() {
+            @Override
+            public void onInfoCallback(Instruction instruction, String info) {
+                Log.e(""+instruction,""+info);
+                TextView textView= findViewById(R.id.btn_id);
+                textView.setText(info);
+            }
+        });
     }
     @Override
     public void onConnected() {
@@ -78,6 +80,12 @@ public class MainActivity extends AppCompatActivity implements OnDeviceListener 
                 break;
             case R.id.btn_close:
                 controller.sendInstructions(Instruction.LIGHT_CLOSE);
+                break;
+            case R.id.btn_water:
+                controller.sendInstructions(Instruction.WATER);
+                break;
+            case R.id.btn_id:
+                controller.sendInstructions(Instruction.UNIQUE_CODE);
                 break;
         }
     }
