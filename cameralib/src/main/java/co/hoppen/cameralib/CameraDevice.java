@@ -230,8 +230,8 @@ public class CameraDevice extends HoppenDevice implements IButtonCallback {
             width = 800;
             height = 600;
         }else if (productName.equals("WAX-PF4D3-MK")){
-            width = 1280;
-            height = 1024;
+            width = 800;
+            height = 600;
         }else if (productName.equals("WAX-PF4D2-SX")){
             width = 640;
             height = 480;
