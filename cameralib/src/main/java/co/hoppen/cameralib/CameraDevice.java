@@ -14,6 +14,7 @@ import java.util.List;
 
 import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers;
 import io.reactivex.rxjava3.core.Observable;
+import io.reactivex.rxjava3.functions.Consumer;
 
 /**
  * Created by YangJianHui on 2021/3/16.
@@ -148,20 +149,38 @@ public class CameraDevice extends HoppenDevice implements IButtonCallback {
                 uvcCamera.nativeXuWrite(writeCmd, writeAddr, 4, pdat);
                 uvcCamera.nativeXuRead(readCmd, readAddr, 3, pdat);
                 LogUtils.e("new camera" +  Arrays.toString(pdat));
+                if (onWaterListener!=null){
+                    Observable.just(pdat).observeOn(AndroidSchedulers.mainThread()).subscribe(bytes -> {
+                        try {
+                            float water = Float.parseFloat(bytes[1] + "." + bytes[2]);
+                            LogUtils.e(water);
+                            if (water>=0){
+                                onWaterListener.onWaterCallback(water);
+                            }
+                        }catch (Exception e){
+                        }
+                    });
+                }
                 break;
             case UNIQUE_CODE:
-                pdat = new byte[12];
-                uvcCamera.nativeXuRead(0x02c2, 0xFE00, pdat.length, pdat);
-                LogUtils.e(Arrays.toString(pdat));
-                LogUtils.e(new String(pdat));
-//                byte[] a = ConvertUtils.string2Bytes("SXB0100001");
-//                LogUtils.e(new String(a));
-//                LogUtils.e(Arrays.toString(a));
-//                LogUtils.e(ConvertUtils.bytes2String(a));
-                if (onInfoListener!=null){
-                    Observable.just(new String(pdat)).observeOn(AndroidSchedulers.mainThread()).subscribe(info ->
-                                onInfoListener.onInfoCallback(instruction, info)
+                byte[] pbuf1 = new byte[4];
+                uvcCamera.nativeXuRead(0x02c2, 0xFE00, 4, pbuf1);
+                LogUtils.e(Arrays.toString(pbuf1));
+                if (pbuf1[0]==0xff && pbuf1[1]==0xff && pbuf1[2]==0xff && pbuf1[3]==0xff) {
+                }else {
+                    try {
+                        int len = (pbuf1[0]<<24) + (pbuf1[1]<<16) + (pbuf1[2]<<8) + pbuf1[3] - 4;
+                        byte[] pbuf2 = new byte[len];
+                        LogUtils.e(len);
+                        uvcCamera.nativeXuRead(0x02c2, 0xFE00+4, len, pbuf2);
+                        if (onInfoListener!=null){
+                            Observable.just(new String(pbuf2,0,12)).observeOn(AndroidSchedulers.mainThread()).subscribe(info ->
+                                    onInfoListener.onInfoCallback(instruction, info)
                             );
+                        }
+                    }catch (Exception e){
+                        LogUtils.e(e.toString());
+                    }
                 }
                 break;
         }
@@ -237,6 +256,10 @@ public class CameraDevice extends HoppenDevice implements IButtonCallback {
             height = 480;
             specialDevice = true;
         }else if (productName.equals("WAX-PF4D3-SX")){
+            width = 640;
+            height = 480;
+            specialDevice = true;
+        }else if (productName.equals("USB Camera")){
             width = 640;
             height = 480;
             specialDevice = true;

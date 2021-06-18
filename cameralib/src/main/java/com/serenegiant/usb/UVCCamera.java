@@ -1107,6 +1107,7 @@ public class UVCCamera {
 
     // qzm
     private static native int native_xu_write(final long id_camera, int cmd, int addr, int len, byte [] pbuf);
+    private static native int native_xu_write2(final long id_camera, int cmd, int addr);
     private static native int native_xu_read(final long id_camera, int cmd, int addr, int len, byte [] pbuf);
 
 
@@ -1117,6 +1118,14 @@ public class UVCCamera {
         } else {
             return -1;
         }
+    }
+    public int nativeXuWrite2(int cmd, int addr) {
+        if (mControlBlock != null) {
+            return native_xu_write2(mNativePtr, cmd, addr);
+        } else {
+            return -1;
+        }
+
     }
 
     public int nativeXuRead(int cmd, int addr, int len, byte[] pbuf)
