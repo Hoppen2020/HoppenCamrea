@@ -7,6 +7,7 @@ import android.os.Looper;
 import android.util.Log;
 import android.view.View;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import co.hoppen.cameralib.HoppenCameraHelper;
 import co.hoppen.cameralib.HoppenController;
@@ -35,6 +36,7 @@ public class MainActivity extends AppCompatActivity implements OnDeviceListener 
             @Override
             public void onButton(int state) {
                 if (state==1){
+                    Log.e("xxxxx",""+ (Looper.getMainLooper().getThread() == Thread.currentThread()));
                     controller.sendInstructions(Instruction.WATER);
                 }
             }

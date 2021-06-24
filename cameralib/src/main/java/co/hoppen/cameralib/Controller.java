@@ -27,7 +27,7 @@ public interface Controller {
 
         void setDeviceButton(OnButtonListener onDeviceButton);
 
-        boolean sendInstructions(Instruction instruction);
+        void sendInstructions(Instruction instruction);
 
         String getDeviceName();
 }

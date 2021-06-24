@@ -47,7 +47,6 @@ public class McuDevice extends HoppenDevice{
                     if (bytes!=null){
                         LogUtils.e(Arrays.toString(bytes));
                         String data = decodingData(bytes);
-                        LogUtils.e(data);
                         if (onWaterListener!=null){
                             float water = decodingWater(data);
                             if (water>=0){
@@ -153,41 +152,50 @@ public class McuDevice extends HoppenDevice{
     }
 
     @Override
-    public boolean sendInstructions(Instruction instruction){
-        if ((currentMode==MODE_NONE || currentMode==MODE_SINGLE)
-                &&
-                instruction != Instruction.WATER) return false;
-        if (currentMode==MODE_NONE && instruction == Instruction.WATER){
-            waterForMainThread(-1);
-            return true;
-        }
-        byte [] bytes = null;
-        switch (instruction){
-            case LIGHT_CLOSE:
-                bytes = UsbInstructionUtils.USB_CAMERA_LIGHT_CLOSE();
-                break;
-            case LIGHT_UV:
-                bytes = UsbInstructionUtils.USB_CAMERA_LIGHT_UV();
-                break;
-            case LIGHT_RGB:
-                bytes = UsbInstructionUtils.USB_CAMERA_LIGHT_RGB();
-                break;
-            case LIGHT_POLARIZED:
-                bytes = UsbInstructionUtils.USB_CAMERA_LIGHT_POLARIZED();
-                break;
-            case PRODUCT_CODE:
-                bytes = UsbInstructionUtils.USB_CAMERA_PRODUCT_CODE();
-                break;
-            case SYS_ONLINE:
-                bytes = UsbInstructionUtils.USB_CAMERA_SYS_ONLINE();
-                break;
-            case WATER:
-                bytes = currentMode==MODE_AUTO?
-                        UsbInstructionUtils.USB_CAMERA_WATER():
-                        UsbInstructionUtils.USB_CAMERA_WATER_SINGLE_MODE();
-                break;
-        }
-        return sendInstructions(bytes);
+    public void sendInstructions(Instruction instruction){
+        Observable.just(instruction)
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe(new Consumer<Instruction>() {
+            @Override
+            public void accept(Instruction instruction) throws Throwable {
+                if ((currentMode==MODE_NONE || currentMode==MODE_SINGLE)
+                        &&
+                        instruction != Instruction.WATER) return;
+                if (currentMode==MODE_NONE && instruction == Instruction.WATER){
+                    waterForMainThread(-1);
+                    return;
+                }
+                byte [] bytes = null;
+                switch (instruction){
+                    case LIGHT_CLOSE:
+                        bytes = UsbInstructionUtils.USB_CAMERA_LIGHT_CLOSE();
+                        break;
+                    case LIGHT_UV:
+                        bytes = UsbInstructionUtils.USB_CAMERA_LIGHT_UV();
+                        break;
+                    case LIGHT_RGB:
+                        bytes = UsbInstructionUtils.USB_CAMERA_LIGHT_RGB();
+                        break;
+                    case LIGHT_POLARIZED:
+                        bytes = UsbInstructionUtils.USB_CAMERA_LIGHT_POLARIZED();
+                        break;
+                    case PRODUCT_CODE:
+                        bytes = UsbInstructionUtils.USB_CAMERA_PRODUCT_CODE();
+                        break;
+                    case SYS_ONLINE:
+                        bytes = UsbInstructionUtils.USB_CAMERA_SYS_ONLINE();
+                        break;
+                    case WATER:
+                        bytes = currentMode==MODE_AUTO?
+                                UsbInstructionUtils.USB_CAMERA_WATER():
+                                UsbInstructionUtils.USB_CAMERA_WATER_SINGLE_MODE();
+                        break;
+                }
+                sendInstructions(bytes);
+            }
+        },throwable -> {
+            //错误信息
+        });
     }
 
     @Override
@@ -195,6 +203,7 @@ public class McuDevice extends HoppenDevice{
         if (usbDeviceConnection!=null){
             try {
                 if (deviceName!=null){
+                    currentMode = MODE_NONE;
                     if (disposable!=null)disposable.dispose();
                     usbDeviceConnection.releaseInterface(usbInterface);
                     usbDeviceConnection.close();

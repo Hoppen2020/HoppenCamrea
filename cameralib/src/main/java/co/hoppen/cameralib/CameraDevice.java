@@ -3,8 +3,11 @@ package co.hoppen.cameralib;
 import android.hardware.usb.UsbDevice;
 import android.hardware.usb.UsbManager;
 import android.view.Surface;
+import android.widget.Toast;
 
 import com.blankj.utilcode.util.LogUtils;
+import com.blankj.utilcode.util.ThreadUtils;
+import com.blankj.utilcode.util.ToastUtils;
 import com.serenegiant.usb.IButtonCallback;
 import com.serenegiant.usb.Size;
 import com.serenegiant.usb.UVCCamera;
@@ -13,8 +16,12 @@ import java.util.Arrays;
 import java.util.List;
 
 import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers;
+import io.reactivex.rxjava3.annotations.NonNull;
 import io.reactivex.rxjava3.core.Observable;
+import io.reactivex.rxjava3.core.ObservableEmitter;
+import io.reactivex.rxjava3.core.ObservableOnSubscribe;
 import io.reactivex.rxjava3.functions.Consumer;
+import io.reactivex.rxjava3.schedulers.Schedulers;
 
 /**
  * Created by YangJianHui on 2021/3/16.
@@ -79,6 +86,7 @@ public class CameraDevice extends HoppenDevice implements IButtonCallback {
     public void onDisconnect(UsbDevice usbDevice, DeviceType type) {
         if (deviceName!= null && deviceName.equals(usbDevice.getDeviceName())){
             cameraName = "";
+            specialDevice = false;
             this.closeDevice();
         }
     }
@@ -109,82 +117,84 @@ public class CameraDevice extends HoppenDevice implements IButtonCallback {
     }
 
     @Override
-    protected boolean sendInstructions(Instruction instruction) {
-        if (!specialDevice && uvcCamera!=null)return false;
-        int writeCmd = 0x82;
-        int readCmd = 0xc2;
-        int writeAddr = 0xd55b;
-        int readAddr = 0xd55c;
-        int send = -1;
-        byte [] pdat = new byte[4];
-        pdat[0] = 0x0;	// 0 for write, 1 for read
-        pdat[1] = 0x78;	// slave id (same for read and write)
-        pdat[2] = 0;
-        pdat[3] = 0;
-        switch (instruction){
-            case LIGHT_CLOSE:
-                pdat[2] = 0x10;
-                pdat[3] = 0x00;
-                send = uvcCamera.nativeXuWrite(writeCmd,writeAddr,pdat.length,pdat);
-                break;
-            case LIGHT_UV:
-                pdat[2] = 0x13;
-                pdat[3] = (byte) 0xff;
-                send = uvcCamera.nativeXuWrite(writeCmd,writeAddr,pdat.length,pdat);
-                break;
-            case LIGHT_RGB:
-                pdat[2] = 0x11;
-                pdat[3] = (byte) 0xff;
-                send = uvcCamera.nativeXuWrite(writeCmd,writeAddr,pdat.length,pdat);
-                break;
-            case LIGHT_POLARIZED:
-                pdat[2] = 0x12;
-                pdat[3] = (byte) 0xff;
-                send = uvcCamera.nativeXuWrite(writeCmd,writeAddr,pdat.length,pdat);
-                break;
-            case WATER:
-                pdat[0] = 0x1;	// 0 for write, 1 for read
-                pdat[1] = 0x79;
-                pdat[2] = 0;
-                uvcCamera.nativeXuWrite(writeCmd, writeAddr, 4, pdat);
-                uvcCamera.nativeXuRead(readCmd, readAddr, 3, pdat);
-                LogUtils.e("new camera" +  Arrays.toString(pdat));
-                if (onWaterListener!=null){
-                    Observable.just(pdat).observeOn(AndroidSchedulers.mainThread()).subscribe(bytes -> {
-                        try {
-                            float water = Float.parseFloat(bytes[1] + "." + bytes[2]);
-                            LogUtils.e(water);
-                            if (water>=0){
-                                onWaterListener.onWaterCallback(water);
-                            }
-                        }catch (Exception e){
+    protected void sendInstructions(Instruction instruction) {
+        if (!specialDevice && uvcCamera!=null)return;
+        Observable.just(instruction)
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe(new Consumer<Instruction>() {
+                    @Override
+                    public void accept(Instruction instruction) throws Throwable {
+                        int writeCmd = 0x82;
+                        int readCmd = 0xc2;
+                        int writeAddr = 0xd55b;
+                        int readAddr = 0xd55c;
+                        int send = -1;
+                        byte[] pdat = new byte[4];
+                        pdat[0] = 0x0;    // 0 for write, 1 for read
+                        pdat[1] = 0x78;    // slave id (same for read and write)
+                        pdat[2] = 0;
+                        pdat[3] = 0;
+                        switch (instruction) {
+                            case LIGHT_CLOSE:
+                                pdat[2] = 0x10;
+                                pdat[3] = 0x00;
+                                send = uvcCamera.nativeXuWrite(writeCmd, writeAddr, pdat.length, pdat);
+                                break;
+                            case LIGHT_UV:
+                                pdat[2] = 0x13;
+                                pdat[3] = (byte) 0xff;
+                                send = uvcCamera.nativeXuWrite(writeCmd, writeAddr, pdat.length, pdat);
+                                break;
+                            case LIGHT_RGB:
+                                pdat[2] = 0x11;
+                                pdat[3] = (byte) 0xff;
+                                send = uvcCamera.nativeXuWrite(writeCmd, writeAddr, pdat.length, pdat);
+                                break;
+                            case LIGHT_POLARIZED:
+                                pdat[2] = 0x12;
+                                pdat[3] = (byte) 0xff;
+                                send = uvcCamera.nativeXuWrite(writeCmd, writeAddr, pdat.length, pdat);
+                                break;
+                            case WATER:
+                                pdat[0] = 0x1;    // 0 for write, 1 for read
+                                pdat[1] = 0x78;
+                                pdat[2] = 0x79;
+                                uvcCamera.nativeXuWrite(writeCmd, writeAddr, 4, pdat);
+                                uvcCamera.nativeXuRead(readCmd, readAddr, 4, pdat);
+                                //ToastUtils.showShort(Arrays.toString(pdat));
+                                            if (onWaterListener != null) {
+                                                int a = pdat[0];
+                                                int b = pdat[1];
+                                                int c = pdat[2];
+                                                int d = a^b;
+                                                if (c == d){
+                                                    float water = Float.parseFloat(a+ "." + b);
+                                                    if (water >= 0) {
+                                                        onWaterListener.onWaterCallback(water);
+                                                    }
+                                                }
+                                            }
+                                break;
+                            case UNIQUE_CODE:
+                                byte[] pbuf1 = new byte[4];
+                                uvcCamera.nativeXuRead(0x02c2, 0xFE00, 4, pbuf1);
+                                if (pbuf1[0] == 0xff && pbuf1[1] == 0xff && pbuf1[2] == 0xff && pbuf1[3] == 0xff) {
+                                } else {
+                                    int len = (pbuf1[0] << 24) + (pbuf1[1] << 16) + (pbuf1[2] << 8) + pbuf1[3] - 4;
+                                    byte[] pbuf2 = new byte[len];
+                                    LogUtils.e(len);
+                                    uvcCamera.nativeXuRead(0x02c2, 0xFE00 + 4, len, pbuf2);
+                                    if (onInfoListener != null) {
+                                        String info = new String(pbuf2, 0, 12);
+                                        onInfoListener.onInfoCallback(instruction, info);
+                                    }
+                                }
+                                break;
                         }
-                    });
-                }
-                break;
-            case UNIQUE_CODE:
-                byte[] pbuf1 = new byte[4];
-                uvcCamera.nativeXuRead(0x02c2, 0xFE00, 4, pbuf1);
-                LogUtils.e(Arrays.toString(pbuf1));
-                if (pbuf1[0]==0xff && pbuf1[1]==0xff && pbuf1[2]==0xff && pbuf1[3]==0xff) {
-                }else {
-                    try {
-                        int len = (pbuf1[0]<<24) + (pbuf1[1]<<16) + (pbuf1[2]<<8) + pbuf1[3] - 4;
-                        byte[] pbuf2 = new byte[len];
-                        LogUtils.e(len);
-                        uvcCamera.nativeXuRead(0x02c2, 0xFE00+4, len, pbuf2);
-                        if (onInfoListener!=null){
-                            Observable.just(new String(pbuf2,0,12)).observeOn(AndroidSchedulers.mainThread()).subscribe(info ->
-                                    onInfoListener.onInfoCallback(instruction, info)
-                            );
-                        }
-                    }catch (Exception e){
-                        LogUtils.e(e.toString());
                     }
-                }
-                break;
-        }
-        return send!=-1;
+                }, throwable -> {
+                    //错误信息
+                });
     }
 
     @Override
@@ -219,7 +229,8 @@ public class CameraDevice extends HoppenDevice implements IButtonCallback {
     @Override
     public void onButton(int button, int state) {
         if (onDeviceButton!=null){
-            Observable.just(state).observeOn(AndroidSchedulers.mainThread()).subscribe(integer -> onDeviceButton.onButton(state));
+            //解决 sxw手柄在某平板卡视频流（无解）
+            ThreadUtils.runOnUiThread(() -> onDeviceButton.onButton(state));
         }
     }
 
@@ -244,10 +255,9 @@ public class CameraDevice extends HoppenDevice implements IButtonCallback {
     }
 
     private void createPreviewSize(String productName){
-        LogUtils.e(productName);
         if (productName.equals("WAX-04+80")){
-            width = 800;
-            height = 600;
+            width = 640;
+            height = 480;
         }else if (productName.equals("WAX-PF4D3-MK")){
             width = 800;
             height = 600;
@@ -256,12 +266,8 @@ public class CameraDevice extends HoppenDevice implements IButtonCallback {
             height = 480;
             specialDevice = true;
         }else if (productName.equals("WAX-PF4D3-SX")){
-            width = 640;
-            height = 480;
-            specialDevice = true;
-        }else if (productName.equals("USB Camera")){
-            width = 640;
-            height = 480;
+            width = 1280;
+            height = 960;
             specialDevice = true;
         }
     }

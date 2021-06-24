@@ -8,6 +8,10 @@ import com.serenegiant.usb.Size;
 
 import java.util.List;
 
+import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers;
+import io.reactivex.rxjava3.core.Observable;
+import io.reactivex.rxjava3.functions.Consumer;
+
 /**
  * Created by YangJianHui on 2021/3/17.
  */
@@ -70,10 +74,10 @@ public class HoppenController implements Controller{
     }
 
     @Override
-    public boolean sendInstructions(Instruction instruction) {
+    public void sendInstructions(Instruction instruction) {
         if (cameraDevice.isSpecialDevice()){
-            return cameraDevice.sendInstructions(instruction);
-        }else return mcuDevice.sendInstructions(instruction);
+            cameraDevice.sendInstructions(instruction);
+        }else mcuDevice.sendInstructions(instruction);
     }
 
     @Override

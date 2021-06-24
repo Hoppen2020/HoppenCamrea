@@ -26,6 +26,7 @@ public class UsbMonitor{
     private UsbManager usbManager;
     private List<DeviceFilter> filterList;
     private OnUsbStatusListener onCameraListener;
+    private Map<String,UsbDevice> doubleCheckMap = new HashMap<>();//某些平板厂商需要用到doublecheck
 
     public UsbMonitor(UsbManager usbManager,OnUsbStatusListener onCameraListener){
         if (usbManager!=null && onCameraListener!=null){
@@ -36,12 +37,12 @@ public class UsbMonitor{
     }
 
     public void register(Context context){
-            initUsbReceiver();
-            IntentFilter filter = new IntentFilter();
-            filter.addAction(UsbManager.ACTION_USB_DEVICE_ATTACHED);
-            filter.addAction(UsbManager.ACTION_USB_DEVICE_DETACHED);
-            filter.addAction(USB_PERMISSION);
-            context.registerReceiver(usbReceiver,filter);
+        initUsbReceiver();
+        IntentFilter filter = new IntentFilter();
+        filter.addAction(UsbManager.ACTION_USB_DEVICE_ATTACHED);
+        filter.addAction(UsbManager.ACTION_USB_DEVICE_DETACHED);
+        filter.addAction(USB_PERMISSION);
+        context.registerReceiver(usbReceiver,filter);
     }
 
     private void initUsbReceiver() {
@@ -54,18 +55,24 @@ public class UsbMonitor{
                             ||action.equals(UsbManager.ACTION_USB_DEVICE_DETACHED)
                             ||action.equals(USB_PERMISSION)){
                         UsbDevice usbDevice = intent.getParcelableExtra(UsbManager.EXTRA_DEVICE);
-                        LogUtils.e(usbDevice.getVendorId(),usbDevice.getProductId());
                         DeviceFilter hoppenDevice = deviceFilter(usbDevice);
                         if (hoppenDevice!=null){
                             if (action.equals(UsbManager.ACTION_USB_DEVICE_ATTACHED)){
-                                requestPermission(context,usbDevice,hoppenDevice.type);
-                            }else if (action.equals(UsbManager.ACTION_USB_DEVICE_DETACHED)){
-                                     onCameraListener.onDisconnect(usbDevice,hoppenDevice.type);
-                            }else if (action.equals(USB_PERMISSION)){
-                                if (intent.getBooleanExtra(UsbManager.EXTRA_PERMISSION_GRANTED, false)){
+                                if (hasPermission(usbDevice)){//为了适配某些厂商 在插入时就直接有权限
                                     onCameraListener.onConnecting(usbDevice,hoppenDevice.type);
                                 }else {
-                                    requestPermission(context,usbDevice,hoppenDevice.type);
+                                    doubleCheckMap.put(usbDevice.getDeviceName(),usbDevice);
+                                    requestPermission(context,usbDevice);
+                                }
+                            }else if (action.equals(UsbManager.ACTION_USB_DEVICE_DETACHED)){
+                                onCameraListener.onDisconnect(usbDevice,hoppenDevice.type);
+                            }else if (action.equals(USB_PERMISSION)){
+                                if (intent.getBooleanExtra(UsbManager.EXTRA_PERMISSION_GRANTED, false)){
+                                    doubleCheckMap.remove(usbDevice.getDeviceName());
+                                    onCameraListener.onConnecting(usbDevice,hoppenDevice.type);
+                                    doubleCheckPermission(context);
+                                }else {
+                                    requestPermission(context,usbDevice);
                                 }
                             }
                         }
@@ -76,24 +83,36 @@ public class UsbMonitor{
         }
     }
 
-    public void unregister(Context context){
-            if (usbReceiver!=null){
-                context.unregisterReceiver(usbReceiver);
-                usbReceiver = null;
-            }
+    private void doubleCheckPermission(Context context){
+        for (UsbDevice value : doubleCheckMap.values()) {
+            requestPermission(context , value);
+        }
     }
 
-    private void requestPermission(Context context , UsbDevice usbDevice,DeviceType type){
-        if (usbDevice!=null){
-                    if (!usbManager.hasPermission(usbDevice)){
-                        PendingIntent pendingIntent =
-                                PendingIntent.getBroadcast(context, 0, new Intent(USB_PERMISSION), 0);
-                        usbManager.requestPermission(usbDevice,pendingIntent);
-                    }else {
-                        //每个厂商改的底层代码不一样（ 为了防止问题 ）
-                        onCameraListener.onConnecting(usbDevice,type);
-                    }
+    public void unregister(Context context){
+        if (usbReceiver!=null){
+            context.unregisterReceiver(usbReceiver);
+            usbReceiver = null;
         }
+    }
+
+    /**
+     *
+     * @param context
+     * @param usbDevice
+     */
+    private void requestPermission(Context context , UsbDevice usbDevice){
+        if (usbDevice!=null){
+            PendingIntent pendingIntent =
+                    PendingIntent.getBroadcast(context, 0, new Intent(USB_PERMISSION), 0);
+            usbManager.requestPermission(usbDevice,pendingIntent);
+        }
+    }
+
+    private boolean hasPermission(UsbDevice usbDevice){
+        if (usbDevice!=null){
+            return usbManager.hasPermission(usbDevice);
+        }else return false;
     }
 
     public List<UsbDevice> requestDeviceList(Context context){
@@ -103,7 +122,12 @@ public class UsbMonitor{
             UsbDevice next = iterator.next();
             DeviceFilter hoppenDevice = deviceFilter(next);
             if (hoppenDevice!=null){
-                requestPermission(context,next,hoppenDevice.type);
+                if (hasPermission(next)){
+                    onCameraListener.onConnecting(next,hoppenDevice.type);
+                }else {
+                    doubleCheckMap.put(next.getDeviceName(),next);
+                    requestPermission(context,next);
+                }
             }
         }
         return usbDevices;
