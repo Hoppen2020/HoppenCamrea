@@ -6,6 +6,7 @@ import android.view.Surface;
 import android.widget.Toast;
 
 import com.blankj.utilcode.util.LogUtils;
+import com.blankj.utilcode.util.StringUtils;
 import com.blankj.utilcode.util.ThreadUtils;
 import com.blankj.utilcode.util.ToastUtils;
 import com.serenegiant.usb.IButtonCallback;
@@ -14,6 +15,7 @@ import com.serenegiant.usb.UVCCamera;
 
 import java.util.Arrays;
 import java.util.List;
+import java.util.Random;
 
 import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers;
 import io.reactivex.rxjava3.annotations.NonNull;
@@ -65,8 +67,8 @@ public class CameraDevice extends HoppenDevice implements IButtonCallback {
                 return;
             }
         }
-        createPreviewSize(usbDevice.getProductName());
         cameraName = usbDevice.getProductName();
+        createPreviewSize(cameraName);
         if (controlBlock==null){
             controlBlock = new ControlBlock(usbManager,usbDevice);
             if (controlBlock.open()!=null){
@@ -174,11 +176,13 @@ public class CameraDevice extends HoppenDevice implements IButtonCallback {
                                                     }
                                                 }
                                             }
+                                uvcCamera.setBrightness(0);
                                 break;
                             case UNIQUE_CODE:
                                 byte[] pbuf1 = new byte[4];
                                 uvcCamera.nativeXuRead(0x02c2, 0xFE00, 4, pbuf1);
                                 if (pbuf1[0] == 0xff && pbuf1[1] == 0xff && pbuf1[2] == 0xff && pbuf1[3] == 0xff) {
+                                    //nothing work
                                 } else {
                                     int len = (pbuf1[0] << 24) + (pbuf1[1] << 16) + (pbuf1[2] << 8) + pbuf1[3] - 4;
                                     byte[] pbuf2 = new byte[len];
@@ -211,6 +215,7 @@ public class CameraDevice extends HoppenDevice implements IButtonCallback {
     protected void closeDevice() {
         try {
             if (deviceName!=null){
+                deviceName = null;
                 if (uvcCamera != null) {
                     uvcCamera.destroy();
                     uvcCamera = null;
@@ -219,7 +224,6 @@ public class CameraDevice extends HoppenDevice implements IButtonCallback {
                     controlBlock.close();
                     controlBlock = null;
                 }
-                deviceName = null;
             }
         } catch (Exception e) {
             e.printStackTrace();
@@ -255,20 +259,22 @@ public class CameraDevice extends HoppenDevice implements IButtonCallback {
     }
 
     private void createPreviewSize(String productName){
-        if (productName.equals("WAX-04+80")){
-            width = 640;
-            height = 480;
-        }else if (productName.equals("WAX-PF4D3-MK")){
-            width = 800;
-            height = 600;
-        }else if (productName.equals("WAX-PF4D2-SX")){
-            width = 640;
-            height = 480;
-            specialDevice = true;
-        }else if (productName.equals("WAX-PF4D3-SX")){
-            width = 1280;
-            height = 960;
-            specialDevice = true;
+        if (!StringUtils.isEmpty(productName)){
+            if (productName.equals("WAX-04+80")){
+                width = 640;
+                height = 480;
+            }else if (productName.equals("WAX-PF4D3-MK")){
+                width = 800;
+                height = 600;
+            }else if (productName.equals("WAX-PF4D2-SX")){
+                width = 640;
+                height = 480;
+                specialDevice = true;
+            }else if (productName.equals("WAX-PF4D3-SX")){
+                width = 1280;
+                height = 960;
+                specialDevice = true;
+            }
         }
     }
 
