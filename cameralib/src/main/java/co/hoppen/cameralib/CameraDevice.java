@@ -59,7 +59,7 @@ public class CameraDevice extends HoppenDevice implements IButtonCallback {
 
     @Override
     public void onConnecting(UsbDevice usbDevice, DeviceType type) {
-        //LogUtils.e(usbDevice.toString());
+        //LogUtils.e(usbDevice.toString(),usbDevice.getDeviceName(),usbDevice.getProductName());
         if (deviceName==null){
             deviceName = usbDevice.getDeviceName();
         }else {
@@ -68,6 +68,11 @@ public class CameraDevice extends HoppenDevice implements IButtonCallback {
             }
         }
         cameraName = usbDevice.getProductName();
+        if (cameraName==null){
+            //可因usbhub导致 快速插拔 影响 无法获取device信息
+            LogUtils.e(usbDevice.toString());
+            return;
+        }
         createPreviewSize(cameraName);
         if (controlBlock==null){
             controlBlock = new ControlBlock(usbManager,usbDevice);
@@ -80,6 +85,11 @@ public class CameraDevice extends HoppenDevice implements IButtonCallback {
                 } catch (Exception e) {
                     e.printStackTrace();
                 }
+            }else {
+                //LogUtils.e("null null null");
+                cameraName = "";
+                specialDevice = false;
+                this.closeDevice();
             }
         }
     }
