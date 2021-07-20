@@ -21,7 +21,7 @@ import co.hoppen.cameralib.widget.UVCCameraTextureView;
 /**
  * Created by YangJianHui on 2021/3/15.
  */
-public class HoppenCameraHelper implements LifecycleEventObserver,OnUsbStatusListener,TextureView.SurfaceTextureListener {
+public class HoppenCameraHelper implements LifecycleEventObserver,OnUsbStatusListener,TextureView.SurfaceTextureListener,OnErrorListener {
     private UsbMonitor usbMonitor;
     private HoppenController controller;
     private AppCompatActivity appCompatActivity;
@@ -42,7 +42,7 @@ public class HoppenCameraHelper implements LifecycleEventObserver,OnUsbStatusLis
             UsbManager usbManager = (UsbManager) activity.getSystemService(Context.USB_SERVICE);
             textureView.setSurfaceTextureListener(this);
             usbMonitor = new UsbMonitor(usbManager,this);
-            controller = new HoppenController(usbManager);
+            controller = new HoppenController(usbManager,this);
             if (this.onDeviceListener==null){
                 if (activity instanceof OnDeviceListener) this.onDeviceListener = (OnDeviceListener) activity;
             }
@@ -95,7 +95,7 @@ public class HoppenCameraHelper implements LifecycleEventObserver,OnUsbStatusLis
                 controller.getMcuDevice().onDisconnect(usbDevice,type);
             }else if (type == DeviceType.CAMERA){
                 controller.getCameraDevice().onDisconnect(usbDevice,type);
-                if (onDeviceListener!=null)onDeviceListener.onDisconnect();
+                if (onDeviceListener!=null)onDeviceListener.onDisconnect(ErrorCode.NORMAL);
             }
         }
     }
@@ -122,5 +122,10 @@ public class HoppenCameraHelper implements LifecycleEventObserver,OnUsbStatusLis
     @Override
     public void onSurfaceTextureUpdated(SurfaceTexture surface) {
 
+    }
+
+    @Override
+    public void onError(ErrorCode errorCode) {
+        if (onDeviceListener!=null)onDeviceListener.onDisconnect(ErrorCode.DEVICE_INFO_MISSING);
     }
 }

@@ -9,6 +9,6 @@ public interface OnDeviceListener {
 
     void onConnected();
 
-    void onDisconnect();
+    void onDisconnect(ErrorCode errorCode);
 
 }

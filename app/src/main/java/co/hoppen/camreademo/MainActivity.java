@@ -9,6 +9,7 @@ import android.view.View;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import co.hoppen.cameralib.ErrorCode;
 import co.hoppen.cameralib.HoppenCameraHelper;
 import co.hoppen.cameralib.HoppenController;
 import co.hoppen.cameralib.Instruction;
@@ -64,9 +65,12 @@ public class MainActivity extends AppCompatActivity implements OnDeviceListener 
     }
 
     @Override
-    public void onDisconnect() {
+    public void onDisconnect(ErrorCode errorCode) {
         Log.e("onDisconnect",""+ (Looper.getMainLooper().getThread() == Thread.currentThread()));
         tv_status.setText("已断开");
+        if (errorCode==ErrorCode.DEVICE_INFO_MISSING){
+            Toast.makeText(this,errorCode.toString(),Toast.LENGTH_SHORT).show();
+        }
     }
 
     public void onClick(View view){

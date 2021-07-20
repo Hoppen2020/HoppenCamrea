@@ -42,9 +42,11 @@ public class CameraDevice extends HoppenDevice implements IButtonCallback {
     private boolean specialDevice = false;
     private OnWaterListener onWaterListener;
     private OnInfoListener onInfoListener;
+    private OnErrorListener onErrorListener;
 
-    public CameraDevice(UsbManager usbManager){
+    public CameraDevice(UsbManager usbManager,OnErrorListener onErrorListener){
         this.usbManager = usbManager;
+        this.onErrorListener = onErrorListener;
     }
 
     public void setPreviewDisplay(Surface surface){
@@ -70,7 +72,10 @@ public class CameraDevice extends HoppenDevice implements IButtonCallback {
         cameraName = usbDevice.getProductName();
         if (cameraName==null){
             //可因usbhub导致 快速插拔 影响 无法获取device信息
-            LogUtils.e(usbDevice.toString());
+            //LogUtils.e(usbDevice.toString());
+            if (onErrorListener!=null)onErrorListener.onError(ErrorCode.DEVICE_INFO_MISSING);
+            cameraName = "";
+            specialDevice = false;
             return;
         }
         createPreviewSize(cameraName);
@@ -87,6 +92,7 @@ public class CameraDevice extends HoppenDevice implements IButtonCallback {
                 }
             }else {
                 //LogUtils.e("null null null");
+                if (onErrorListener!=null)onErrorListener.onError(ErrorCode.DEVICE_INFO_MISSING);
                 cameraName = "";
                 specialDevice = false;
                 this.closeDevice();
@@ -196,7 +202,7 @@ public class CameraDevice extends HoppenDevice implements IButtonCallback {
                                 } else {
                                     int len = (pbuf1[0] << 24) + (pbuf1[1] << 16) + (pbuf1[2] << 8) + pbuf1[3] - 4;
                                     byte[] pbuf2 = new byte[len];
-                                    LogUtils.e(len);
+                                    //LogUtils.e(len);
                                     uvcCamera.nativeXuRead(0x02c2, 0xFE00 + 4, len, pbuf2);
                                     if (onInfoListener != null) {
                                         String info = new String(pbuf2, 0, 12);

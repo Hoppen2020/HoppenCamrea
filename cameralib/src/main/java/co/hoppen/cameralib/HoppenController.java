@@ -19,8 +19,9 @@ public class HoppenController implements Controller{
     private CameraDevice cameraDevice;
     private McuDevice mcuDevice;
 
-    public HoppenController(UsbManager usbManager){
-        cameraDevice = new CameraDevice(usbManager);
+
+    public HoppenController(UsbManager usbManager,OnErrorListener onErrorListener){
+        cameraDevice = new CameraDevice(usbManager,onErrorListener);
         mcuDevice = new McuDevice(usbManager);
     }
 
