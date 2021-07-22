@@ -1,5 +1,6 @@
 package co.hoppen.cameralib;
 
+import android.graphics.BlurMaskFilter;
 import android.hardware.usb.UsbDevice;
 import android.hardware.usb.UsbManager;
 import android.view.Surface;
@@ -192,7 +193,7 @@ public class CameraDevice extends HoppenDevice implements IButtonCallback {
                                                     }
                                                 }
                                             }
-                                uvcCamera.setBrightness(0);
+//                                uvcCamera.setBrightness(0);
                                 break;
                             case UNIQUE_CODE:
                                 byte[] pbuf1 = new byte[4];
