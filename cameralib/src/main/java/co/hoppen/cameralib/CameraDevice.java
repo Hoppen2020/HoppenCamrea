@@ -291,6 +291,9 @@ public class CameraDevice extends HoppenDevice implements IButtonCallback {
                 width = 1280;
                 height = 960;
                 specialDevice = true;
+            }else {
+                width = 1600;//1280
+                height = 1200;//720
             }
         }
     }

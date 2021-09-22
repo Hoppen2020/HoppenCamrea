@@ -62,6 +62,8 @@ public class MainActivity extends AppCompatActivity implements OnDeviceListener 
     public void onConnected() {
         Log.e("onConnected",""+ (Looper.getMainLooper().getThread() == Thread.currentThread()));
         tv_status.setText("已连接");
+        ((TextView)findViewById(R.id.tv_id)).setText(""+controller.getDeviceName());
+        Log.e("@@@@@@@@",""+controller.getSupportedPreviewSizes().toString());
     }
 
     @Override

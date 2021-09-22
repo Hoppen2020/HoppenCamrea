@@ -120,6 +120,7 @@ public class UsbMonitor{
         Iterator<UsbDevice> iterator = usbDevices.iterator();
         while (iterator.hasNext()){
             UsbDevice next = iterator.next();
+            LogUtils.e(next.getProductId(),next.getVendorId());
             DeviceFilter hoppenDevice = deviceFilter(next);
             if (hoppenDevice!=null){
                 if (hasPermission(next)){
