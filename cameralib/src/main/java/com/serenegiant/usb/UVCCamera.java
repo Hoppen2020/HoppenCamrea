@@ -160,7 +160,7 @@ public class UVCCamera {
     protected int mSharpnessMin, mSharpnessMax, mSharpnessDef;
     protected int mGainMin, mGainMax, mGainDef;
     protected int mGammaMin, mGammaMax, mGammaDef;
-    protected int mSaturationMin, mSaturationMax, mSaturationDef;
+    protected int mSaturationMin = 0, mSaturationMax = 100, mSaturationDef;
     protected int mHueMin, mHueMax, mHueDef;
     protected int mZoomMin, mZoomMax, mZoomDef;
     protected int mZoomRelMin, mZoomRelMax, mZoomRelDef;

@@ -91,6 +91,11 @@ public class HoppenController implements Controller{
         cameraDevice.setContrast(contrast);
     }
 
+    @Override
+    public void setSaturation(int saturation) {
+        cameraDevice.setSaturation(saturation);
+    }
+
     public void setWaterListener(OnWaterListener onWaterListener){
         cameraDevice.setOnWaterListener(onWaterListener);
         mcuDevice.setOnWaterListener(onWaterListener);

@@ -32,4 +32,6 @@ public interface Controller {
         String getDeviceName();
 
         void setContrast(int contrast);
+
+        void setSaturation(int saturation);
 }

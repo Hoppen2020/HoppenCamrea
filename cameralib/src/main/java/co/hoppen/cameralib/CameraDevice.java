@@ -321,4 +321,10 @@ public class CameraDevice extends HoppenDevice implements IButtonCallback {
          }
     }
 
+    public void setSaturation(int saturation){
+        if (uvcCamera!=null&&algorithm){
+            uvcCamera.setSaturation(saturation);
+        }
+    }
+
 }
