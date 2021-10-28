@@ -124,7 +124,7 @@ public class UVCCamera {
     private ControlBlock mControlBlock;
     protected long mControlSupports;
     protected long mProcSupports;
-    protected int mCurrentFrameFormat = FRAME_FORMAT_MJPEG;
+    protected int mCurrentFrameFormat = FRAME_FORMAT_YUYV;
     protected int mCurrentWidth = DEFAULT_PREVIEW_WIDTH, mCurrentHeight = DEFAULT_PREVIEW_HEIGHT;
     protected float mCurrentBandwidthFactor = DEFAULT_BANDWIDTH;
     protected String mSupportedSize;

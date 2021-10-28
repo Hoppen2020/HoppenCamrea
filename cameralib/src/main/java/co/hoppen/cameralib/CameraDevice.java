@@ -291,9 +291,13 @@ public class CameraDevice extends HoppenDevice implements IButtonCallback {
                 width = 1280;
                 height = 960;
                 specialDevice = true;
+            }else if (productName.equals("WAX_PF4D4_SX")){
+                width = 800;
+                height = 600;
+                specialDevice = true;
             }else {
-                width = 1600;//1280
-                height = 1200;//720
+                width = 640;//1280
+                height = 480;//720
             }
         }
     }

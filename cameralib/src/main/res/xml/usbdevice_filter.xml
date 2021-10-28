@@ -10,6 +10,7 @@
 
     <!-- 测试中，未添加项目，头发，上1280*720，下640*480 -->
     <usb-device vendorId="1443" productId="37424" deviceType = "2" />
+    <usb-device vendorId="2760" productId="12310" deviceType = "2" />
     <!-- 3d摄像头-->
     <usb-device vendorId="3804" productId="12416" deviceType = "2" />
 <!--    <usb-device vendorId="2760" productId="12310" deviceType = "2" />-->
