@@ -86,6 +86,11 @@ public class HoppenController implements Controller{
         return cameraDevice.getCameraName();
     }
 
+    @Override
+    public void setContrast(int contrast) {
+        cameraDevice.setContrast(contrast);
+    }
+
     public void setWaterListener(OnWaterListener onWaterListener){
         cameraDevice.setOnWaterListener(onWaterListener);
         mcuDevice.setOnWaterListener(onWaterListener);
@@ -95,4 +100,7 @@ public class HoppenController implements Controller{
         cameraDevice.setOnInfoListener(onInfoListener);
         mcuDevice.setOnInfoListener(onInfoListener);
     }
+
+
+
 }

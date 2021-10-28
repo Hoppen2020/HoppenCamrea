@@ -41,6 +41,7 @@ public class CameraDevice extends HoppenDevice implements IButtonCallback {
     private final static int DEFAULT_HEIGHT = 600;
     private String cameraName = "";
     private boolean specialDevice = false;
+    private boolean algorithm = false;
     private OnWaterListener onWaterListener;
     private OnInfoListener onInfoListener;
     private OnErrorListener onErrorListener;
@@ -276,6 +277,8 @@ public class CameraDevice extends HoppenDevice implements IButtonCallback {
     }
 
     private void createPreviewSize(String productName){
+        specialDevice = false;
+        algorithm = false;
         if (!StringUtils.isEmpty(productName)){
             if (productName.equals("WAX-04+80")){
                 width = 640;
@@ -295,6 +298,7 @@ public class CameraDevice extends HoppenDevice implements IButtonCallback {
                 width = 800;
                 height = 600;
                 specialDevice = true;
+                algorithm = true;
             }else {
                 width = 640;//1280
                 height = 480;//720
@@ -310,4 +314,11 @@ public class CameraDevice extends HoppenDevice implements IButtonCallback {
     public boolean isSpecialDevice() {
         return specialDevice;
     }
+
+    public void setContrast(int contrast){
+         if (uvcCamera!=null && algorithm){
+             uvcCamera.setContrast(contrast);
+         }
+    }
+
 }

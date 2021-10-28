@@ -91,6 +91,7 @@ public class MainActivity extends AppCompatActivity implements OnDeviceListener 
                 break;
             case R.id.btn_water:
                 controller.sendInstructions(Instruction.WATER);
+                controller.setContrast(100);
                 break;
             case R.id.btn_id:
                 controller.sendInstructions(Instruction.UNIQUE_CODE);

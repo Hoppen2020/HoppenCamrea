@@ -156,7 +156,7 @@ public class UVCCamera {
     protected int mWhiteBlanceRelMin, mWhiteBlanceRelMax, mWhiteBlanceRelDef;
     protected int mBacklightCompMin, mBacklightCompMax, mBacklightCompDef;
     protected int mBrightnessMin, mBrightnessMax, mBrightnessDef;
-    protected int mContrastMin, mContrastMax, mContrastDef;
+    protected int mContrastMin = 0, mContrastMax = 100, mContrastDef;
     protected int mSharpnessMin, mSharpnessMax, mSharpnessDef;
     protected int mGainMin, mGainMax, mGainDef;
     protected int mGammaMin, mGammaMax, mGammaDef;

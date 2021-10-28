@@ -30,4 +30,6 @@ public interface Controller {
         void sendInstructions(Instruction instruction);
 
         String getDeviceName();
+
+        void setContrast(int contrast);
 }
