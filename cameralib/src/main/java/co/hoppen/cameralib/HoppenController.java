@@ -48,15 +48,13 @@ public class HoppenController implements Controller{
         return cameraDevice.getSupportedPreviewSizes();
     }
 
-//    @Override
-//    public void startPreview() {
-//        cameraDevice.startPreview();
-//    }
-//
-//    @Override
-//    public void stopPreview() {
-//        cameraDevice.stopPreview();
-//    }
+    public void startPreview() {
+        cameraDevice.startPreview();
+    }
+
+    public void stopPreview() {
+        cameraDevice.stopPreview();
+    }
 
     @Override
     public void setSurfaceTexture(SurfaceTexture surfaceTexture) {

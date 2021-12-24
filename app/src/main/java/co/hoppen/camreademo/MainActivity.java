@@ -3,6 +3,7 @@ package co.hoppen.camreademo;
 import androidx.appcompat.app.AppCompatActivity;
 
 import android.os.Bundle;
+import android.os.Handler;
 import android.os.Looper;
 import android.util.Log;
 import android.view.View;
@@ -57,6 +58,7 @@ public class MainActivity extends AppCompatActivity implements OnDeviceListener 
                 textView.setText(info);
             }
         });
+
     }
     @Override
     public void onConnected() {
@@ -97,11 +99,29 @@ public class MainActivity extends AppCompatActivity implements OnDeviceListener 
             case R.id.btn_id:
                 controller.sendInstructions(Instruction.UNIQUE_CODE);
                 break;
+            case R.id.btn_start:
+                controller.startPreview();
+                break;
+            case R.id.btn_stop:
+                controller.stopPreview();
+                break;
         }
     }
 
     @Override
     protected void onStop() {
         super.onStop();
+        //controller.stopPreview();
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+//        new Handler().postDelayed(new Runnable() {
+//            @Override
+//            public void run() {
+//                controller.startPreview();
+//            }
+//        },1000);
     }
 }

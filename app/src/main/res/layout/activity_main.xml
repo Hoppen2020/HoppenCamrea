@@ -6,6 +6,30 @@
     android:layout_height="match_parent"
     android:gravity="center"
     >
+    <LinearLayout
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        >
+        <Button
+            android:id="@+id/btn_stop"
+            android:layout_marginTop="10dp"
+            android:layout_width="120dp"
+            android:layout_height="60dp"
+            android:text="Stop"
+            android:onClick="onClick"
+            />
+        <Button
+            android:id="@+id/btn_start"
+            android:layout_marginTop="10dp"
+            android:layout_width="120dp"
+            android:layout_height="60dp"
+            android:text="Stop"
+            android:onClick="onClick"
+            />
+
+    </LinearLayout>
+
     <co.hoppen.cameralib.widget.UVCCameraTextureView
         android:id="@+id/ttv_display"
         android:layout_width="800dp"
