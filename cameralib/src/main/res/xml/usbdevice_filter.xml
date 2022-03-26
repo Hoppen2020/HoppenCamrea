@@ -13,6 +13,9 @@
     <usb-device vendorId="2760" productId="12310" deviceType = "2" />
     <!-- 3d摄像头-->
     <usb-device vendorId="3804" productId="12416" deviceType = "2" />
-<!--    <usb-device vendorId="2760" productId="12310" deviceType = "2" />-->
+
+    <!-- 虹膜-->
+    <usb-device vendorId="2425" productId="632" deviceType = "2" />
+
 
 </usb>

@@ -27,7 +27,7 @@ public class McuDevice extends HoppenDevice{
     private UsbInterface usbInterface;
     private UsbEndpoint epOut, epIn;
     private final static int DEFAULT_MAX_READ_BYTES = 128;
-    private final static int DEFAULT_TIMEOUT = 500;
+    private final static int DEFAULT_TIMEOUT = 300;
     private String deviceName;
     private final static int MODE_AUTO = 1;
     private final static int MODE_SINGLE = 2;

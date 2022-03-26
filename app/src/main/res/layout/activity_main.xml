@@ -6,6 +6,11 @@
     android:layout_height="match_parent"
     android:gravity="center"
     >
+    <co.hoppen.cameralib.widget.UVCCameraTextureView
+        android:id="@+id/ttv_display"
+        android:layout_width="800dp"
+        android:layout_height="600dp"/>
+
     <LinearLayout
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
@@ -30,10 +35,10 @@
 
     </LinearLayout>
 
-    <co.hoppen.cameralib.widget.UVCCameraTextureView
-        android:id="@+id/ttv_display"
-        android:layout_width="800dp"
-        android:layout_height="600dp"/>
+<!--    <co.hoppen.cameralib.widget.UVCCameraTextureView-->
+<!--        android:id="@+id/ttv_display"-->
+<!--        android:layout_width="800dp"-->
+<!--        android:layout_height="600dp"/>-->
 
     <LinearLayout
         android:layout_width="wrap_content"

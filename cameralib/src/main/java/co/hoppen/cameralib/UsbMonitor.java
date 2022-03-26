@@ -55,6 +55,7 @@ public class UsbMonitor{
                             ||action.equals(UsbManager.ACTION_USB_DEVICE_DETACHED)
                             ||action.equals(USB_PERMISSION)){
                         UsbDevice usbDevice = intent.getParcelableExtra(UsbManager.EXTRA_DEVICE);
+                        LogUtils.e(usbDevice.toString());
                         DeviceFilter hoppenDevice = deviceFilter(usbDevice);
                         if (hoppenDevice!=null){
                             if (action.equals(UsbManager.ACTION_USB_DEVICE_ATTACHED)){
@@ -117,10 +118,14 @@ public class UsbMonitor{
 
     public List<UsbDevice> requestDeviceList(Context context){
         ArrayList<UsbDevice> usbDevices = new ArrayList<>(usbManager.getDeviceList().values());
+
+        for (int i = 0; i < usbDevices.size(); i++) {
+            LogUtils.e(usbDevices.toString());
+        }
         Iterator<UsbDevice> iterator = usbDevices.iterator();
         while (iterator.hasNext()){
             UsbDevice next = iterator.next();
-            LogUtils.e(next.getProductId(),next.getVendorId());
+            //LogUtils.e(next.getProductId(),next.getVendorId());
             DeviceFilter hoppenDevice = deviceFilter(next);
             if (hoppenDevice!=null){
                 if (hasPermission(next)){

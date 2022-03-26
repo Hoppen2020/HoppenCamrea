@@ -30,6 +30,8 @@ import android.util.AttributeSet;
 import android.util.Log;
 import android.view.TextureView;
 
+import com.blankj.utilcode.util.LogUtils;
+
 /**
  * change the view size with keeping the specified aspect ratio.
  * if you set this view with in a FrameLayout and set property "android:layout_gravity="center",
@@ -47,6 +49,9 @@ public class UVCCameraTextureView extends TextureView    // API >= 14
 	private final Object mCaptureSync = new Object();
     private Bitmap mTempBitmap;
     private boolean mReqesutCaptureStillImage;
+
+    private int width;
+    private int height;
 
 	public UVCCameraTextureView(final Context context) {
 		this(context, null, 0);
@@ -77,6 +82,7 @@ public class UVCCameraTextureView extends TextureView    // API >= 14
 
 	@Override
     public void setAspectRatio(final double aspectRatio) {
+		LogUtils.e(aspectRatio );
         if (aspectRatio < 0) {
             throw new IllegalArgumentException();
         }
@@ -89,32 +95,30 @@ public class UVCCameraTextureView extends TextureView    // API >= 14
     @Override
     protected void onMeasure(int widthMeasureSpec, int heightMeasureSpec) {
 
-//		if (mRequestedAspect > 0) {
-//			int initialWidth = MeasureSpec.getSize(widthMeasureSpec);
-//			int initialHeight = MeasureSpec.getSize(heightMeasureSpec);
-//
-//			final int horizPadding = getPaddingLeft() + getPaddingRight();
-//			final int vertPadding = getPaddingTop() + getPaddingBottom();
-//			initialWidth -= horizPadding;
-//			initialHeight -= vertPadding;
-//
-//			final double viewAspectRatio = (double)initialWidth / initialHeight;
-//			final double aspectDiff = mRequestedAspect / viewAspectRatio - 1;
-//
-//			if (Math.abs(aspectDiff) > 0.01) {
-//				if (aspectDiff > 0) {
-//					// width priority decision
-//					initialHeight = (int) (initialWidth / mRequestedAspect);
-//				} else {
-//					// height priority decison
-//					initialWidth = (int) (initialHeight * mRequestedAspect);
-//				}
-//				initialWidth += horizPadding;
-//				initialHeight += vertPadding;
-//				widthMeasureSpec = MeasureSpec.makeMeasureSpec(initialWidth, MeasureSpec.EXACTLY);
-//				heightMeasureSpec = MeasureSpec.makeMeasureSpec(initialHeight, MeasureSpec.EXACTLY);
-//			}
-//		}
+		if (mRequestedAspect > 0) {
+			int initialWidth = MeasureSpec.getSize(widthMeasureSpec);
+			int initialHeight = MeasureSpec.getSize(heightMeasureSpec);
+
+			final int horizPadding = getPaddingLeft() + getPaddingRight();
+			final int vertPadding = getPaddingTop() + getPaddingBottom();
+			initialWidth -= horizPadding;
+			initialHeight -= vertPadding;
+
+			final double viewAspectRatio = (double)initialWidth / initialHeight;
+			final double aspectDiff = mRequestedAspect / viewAspectRatio - 1;
+
+			if (Math.abs(aspectDiff) > 0.01) {
+				if (aspectDiff > 0) {
+					initialHeight = (int) (initialWidth / mRequestedAspect);
+				} else {
+					initialWidth = (int) (initialHeight * mRequestedAspect);
+				}
+				initialWidth += horizPadding;
+				initialHeight += vertPadding;
+				widthMeasureSpec = MeasureSpec.makeMeasureSpec(initialWidth, MeasureSpec.EXACTLY);
+				heightMeasureSpec = MeasureSpec.makeMeasureSpec(initialHeight, MeasureSpec.EXACTLY);
+			}
+		}
 
         super.onMeasure(widthMeasureSpec, heightMeasureSpec);
     }
@@ -122,7 +126,6 @@ public class UVCCameraTextureView extends TextureView    // API >= 14
 	@Override
 	public void onSurfaceTextureAvailable(final SurfaceTexture surface, final int width, final int height) {
 		if (DEBUG) Log.v(TAG, "onSurfaceTextureAvailable:" + surface);
-//		mRenderHandler = RenderHandler.createHandler(surface);
 		mHasSurface = true;
 	}
 
@@ -144,11 +147,9 @@ public class UVCCameraTextureView extends TextureView    // API >= 14
 		synchronized (mCaptureSync) {
 			if (mReqesutCaptureStillImage) {
 				mReqesutCaptureStillImage = false;
-				if (mTempBitmap == null)
-					// TODO modify this to change output image size
-					mTempBitmap = getBitmap(800, 600);//3264,2448
-				else
-					getBitmap(mTempBitmap);
+				if (mTempBitmap == null) {
+					mTempBitmap = getBitmap(width, height);//3264,2448
+				} else getBitmap(mTempBitmap);
 				mCaptureSync.notifyAll();
 			}
 		}
@@ -182,6 +183,11 @@ public class UVCCameraTextureView extends TextureView    // API >= 14
 
 	@Override
 	public void setVideoEncoder() {
+	}
+
+	public void setBitmapSize(int width,int height){
+		this.width = width;
+		this.height = height;
 	}
 
 }

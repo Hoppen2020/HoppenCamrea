@@ -11,5 +11,8 @@ public enum Instruction {
     LIGHT_CLOSE,
     SYS_ONLINE,
     WATER,
-    UNIQUE_CODE
+    UNIQUE_CODE,
+    LIGHT_BALANCED_POLARIZED,
+    LIGHT_WOOD;
+
 }

@@ -3,7 +3,6 @@ package co.hoppen.camreademo;
 import androidx.appcompat.app.AppCompatActivity;
 
 import android.os.Bundle;
-import android.os.Handler;
 import android.os.Looper;
 import android.util.Log;
 import android.view.View;
@@ -65,12 +64,12 @@ public class MainActivity extends AppCompatActivity implements OnDeviceListener 
         Log.e("onConnected",""+ (Looper.getMainLooper().getThread() == Thread.currentThread()));
         tv_status.setText("已连接");
         ((TextView)findViewById(R.id.tv_id)).setText(""+controller.getDeviceName());
-        Log.e("@@@@@@@@",""+controller.getSupportedPreviewSizes().toString());
+        //Log.e("@@@@@@@@",""+controller.getSupportedPreviewSizes().toString());
     }
 
     @Override
     public void onDisconnect(ErrorCode errorCode) {
-        Log.e("onDisconnect",""+ (Looper.getMainLooper().getThread() == Thread.currentThread()));
+        //Log.e("onDisconnect",""+ (Looper.getMainLooper().getThread() == Thread.currentThread()));
         tv_status.setText("已断开");
         if (errorCode==ErrorCode.DEVICE_INFO_MISSING){
             Toast.makeText(this,errorCode.toString(),Toast.LENGTH_SHORT).show();

@@ -1,13 +1,11 @@
 package co.hoppen.cameralib;
 
-import android.app.Activity;
 import android.content.Context;
 import android.graphics.SurfaceTexture;
 import android.hardware.usb.UsbDevice;
 import android.hardware.usb.UsbManager;
 import android.os.Handler;
 import android.view.TextureView;
-import android.widget.TextView;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
@@ -16,10 +14,6 @@ import androidx.lifecycle.LifecycleEventObserver;
 import androidx.lifecycle.LifecycleOwner;
 
 import com.blankj.utilcode.util.LogUtils;
-
-import java.util.List;
-
-import co.hoppen.cameralib.widget.UVCCameraTextureView;
 
 /**
  * Created by YangJianHui on 2021/3/15.
@@ -69,13 +63,11 @@ public class HoppenCameraHelper implements LifecycleEventObserver,OnUsbStatusLis
 
     @Override
     public void onStateChanged(@NonNull LifecycleOwner source, @NonNull Lifecycle.Event event) {
-        LogUtils.e(event);
         if (event.equals(Lifecycle.Event.ON_CREATE)){
             usbMonitor.requestDeviceList(appCompatActivity);
         }else if (event.equals(Lifecycle.Event.ON_START)){
             usbMonitor.register(appCompatActivity);
         }else if (event.equals(Lifecycle.Event.ON_STOP)){
-//            stopTag = true;
             usbMonitor.unregister(appCompatActivity);
         }else if (event.equals(Lifecycle.Event.ON_DESTROY)){
             controller.close();
