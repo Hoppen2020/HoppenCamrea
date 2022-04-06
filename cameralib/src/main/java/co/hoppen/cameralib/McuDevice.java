@@ -74,16 +74,22 @@ public class McuDevice extends HoppenDevice{
 
     @Override
     public synchronized void onConnecting(UsbDevice usbDevice, DeviceType type) {
+//        LogUtils.e(deviceName,usbDevice.getDeviceName());
         if (deviceName==null){
             deviceName = usbDevice.getDeviceName();
         }else {
-            if (!deviceName.equals(usbDevice.getDeviceName()))return;
+//            if (!deviceName.equals(usbDevice.getDeviceName())){
+//                return;
+//            }else return;
+            return;
         }
         usbDeviceConnection = usbManager.openDevice(usbDevice);
         int interfaceCount = usbDevice.getInterfaceCount();
+        LogUtils.e(interfaceCount+"/");
         if (usbDeviceConnection!=null && interfaceCount>0){
             usbInterface = usbDevice.getInterface(interfaceCount - 1);
             boolean claimInterface = usbDeviceConnection.claimInterface(usbInterface, false);
+            LogUtils.e(claimInterface);
             if (claimInterface){
                 //设置波特率等设置
                 setConfig(usbDeviceConnection,9600,8,1,0);
@@ -147,6 +153,7 @@ public class McuDevice extends HoppenDevice{
     @Override
     public synchronized void onDisconnect(UsbDevice usbDevice, DeviceType type) {
         if (deviceName!=null && deviceName.equals(usbDevice.getDeviceName())){
+//            LogUtils.e("拔出 " + usbDevice.getDeviceName(),type);
             this.closeDevice();
         }
     }

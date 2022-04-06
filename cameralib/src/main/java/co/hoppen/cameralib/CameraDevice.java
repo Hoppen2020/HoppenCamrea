@@ -8,14 +8,18 @@ import com.blankj.utilcode.util.LogUtils;
 import com.blankj.utilcode.util.StringUtils;
 import com.blankj.utilcode.util.ThreadUtils;
 import com.serenegiant.usb.IButtonCallback;
+import com.serenegiant.usb.IFrameCallback;
 import com.serenegiant.usb.Size;
 import com.serenegiant.usb.UVCCamera;
 
+import java.nio.ByteBuffer;
 import java.util.List;
 
 import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers;
 import io.reactivex.rxjava3.core.Observable;
 import io.reactivex.rxjava3.functions.Consumer;
+
+import static com.serenegiant.usb.UVCCamera.FRAME_FORMAT_MJPEG;
 
 /**
  * Created by YangJianHui on 2021/3/16.
@@ -53,6 +57,8 @@ public class CameraDevice extends HoppenDevice implements IButtonCallback {
         this.surface = surface;
     }
 
+//    boolean aBoolean = false;
+
     @Override
     public void onConnecting(UsbDevice usbDevice, DeviceType type) {
 //        LogUtils.e(usbDevice.toString(),usbDevice.getDeviceName(),usbDevice.getProductName());
@@ -72,6 +78,7 @@ public class CameraDevice extends HoppenDevice implements IButtonCallback {
             specialDevice = false;
             return;
         }
+//        LogUtils.e("探头接入开始时间："+System.currentTimeMillis());
         createPreviewSize(cameraName);
         if (controlBlock==null){
             controlBlock = new ControlBlock(usbManager,usbDevice);
@@ -80,6 +87,15 @@ public class CameraDevice extends HoppenDevice implements IButtonCallback {
                     uvcCamera = new UVCCamera();
                     uvcCamera.open(controlBlock);
                     uvcCamera.setPreviewSize(width, height);
+//                    uvcCamera.setFrameCallback(new IFrameCallback() {
+//                        @Override
+//                        public void onFrame(ByteBuffer frame) {
+//                                if (!aBoolean){
+//                                    LogUtils.e("数据流显示的时间："+System.currentTimeMillis());
+//                                    aBoolean = true;
+//                                }
+//                        }
+//                    },FRAME_FORMAT_MJPEG);
                     startPreview();
                 } catch (Exception e) {
                     e.printStackTrace();
@@ -234,12 +250,12 @@ public class CameraDevice extends HoppenDevice implements IButtonCallback {
                                     send = uvcCamera.nativeXuWrite(writeCmd, writeAddr, pdat.length, pdat);
                                     break;
                                 case LIGHT_POLARIZED://3
-                                    pdat[2] = 0x12;
+                                    pdat[2] = 0x13;
                                     pdat[3] = (byte) 0xff;
                                     send = uvcCamera.nativeXuWrite(writeCmd, writeAddr, pdat.length, pdat);
                                     break;
                                 case LIGHT_BALANCED_POLARIZED:
-                                    pdat[2] = 0x13;
+                                    pdat[2] = 0x12;
                                     pdat[3] = (byte) 0xff;
                                     send = uvcCamera.nativeXuWrite(writeCmd, writeAddr, pdat.length, pdat);
                                     break;

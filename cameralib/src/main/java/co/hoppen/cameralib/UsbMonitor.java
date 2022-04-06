@@ -55,7 +55,7 @@ public class UsbMonitor{
                             ||action.equals(UsbManager.ACTION_USB_DEVICE_DETACHED)
                             ||action.equals(USB_PERMISSION)){
                         UsbDevice usbDevice = intent.getParcelableExtra(UsbManager.EXTRA_DEVICE);
-                        LogUtils.e(usbDevice.toString());
+                        //LogUtils.e(usbDevice.toString());
                         DeviceFilter hoppenDevice = deviceFilter(usbDevice);
                         if (hoppenDevice!=null){
                             if (action.equals(UsbManager.ACTION_USB_DEVICE_ATTACHED)){
