@@ -75,6 +75,10 @@ public final class DeviceFilter {
 		this(vid, pid, clasz, subclass, protocol, manufacturer, product, serialNum, false,type);
 	}
 
+	public DeviceFilter(final  int vid,final int pid,final DeviceType type){
+		this(vid, pid, -1, -1, -1, null, null, null, false,type);
+	}
+
 	public DeviceFilter(final int vid, final int pid, final int clasz, final int subclass,
                         final int protocol, final String manufacturer, final String product, final String serialNum, final boolean isExclude ,
                         final DeviceType type

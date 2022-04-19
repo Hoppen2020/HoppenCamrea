@@ -72,7 +72,7 @@ public class CameraDevice extends HoppenDevice implements IButtonCallback {
         cameraName = usbDevice.getProductName();
         if (cameraName==null){
             //可因usbhub导致 快速插拔 影响 无法获取device信息
-            //LogUtils.e(usbDevice.toString());
+            LogUtils.e(usbDevice.toString());
             if (onErrorListener!=null)onErrorListener.onError(ErrorCode.DEVICE_INFO_MISSING);
             cameraName = "";
             specialDevice = false;

@@ -19,7 +19,10 @@ import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.ArrayList;
+import java.util.List;
 
+import co.hoppen.cameralib.DeviceFilter;
 import co.hoppen.cameralib.ErrorCode;
 import co.hoppen.cameralib.HoppenCameraHelper;
 import co.hoppen.cameralib.HoppenController;
@@ -54,8 +57,8 @@ public class FaceActivity extends BaseActivity implements OnDeviceListener, View
 //      matrix.postScale(-1, 1, w_screen/2, h_screen / 2);//镜像水平翻转
 //      textureView.setTransform(matrix);
       hoppenController = HoppenCameraHelper.createController(this,textureView,this);
-      faceView.setOnLongClickListener(this);
 
+      faceView.setOnLongClickListener(this);
 
    }
 

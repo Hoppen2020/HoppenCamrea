@@ -15,6 +15,8 @@ import androidx.lifecycle.LifecycleOwner;
 
 import com.blankj.utilcode.util.LogUtils;
 
+import java.util.List;
+
 /**
  * Created by YangJianHui on 2021/3/15.
  */
@@ -46,6 +48,23 @@ public class HoppenCameraHelper implements LifecycleEventObserver,OnUsbStatusLis
                 if (activity instanceof OnDeviceListener) this.onDeviceListener = (OnDeviceListener) activity;
             }
         }
+    }
+
+    private HoppenCameraHelper(AppCompatActivity activity, TextureView textureView, OnDeviceListener onDeviceListener, List<DeviceFilter> list){
+        if (activity!=null){
+            this.appCompatActivity = activity;
+            UsbManager usbManager = (UsbManager) activity.getSystemService(Context.USB_SERVICE);
+            textureView.setSurfaceTextureListener(this);
+            usbMonitor = new UsbMonitor(usbManager,this);
+            if (list!=null&&list.size()>0){
+                usbMonitor.addDeviceFilter(true,list);
+            }
+            controller = new HoppenController(usbManager,this);
+            if (this.onDeviceListener==null){
+                if (activity instanceof OnDeviceListener) this.onDeviceListener = (OnDeviceListener) activity;
+            }
+        }
+        this.onDeviceListener = onDeviceListener;
     }
 
     private HoppenCameraHelper(AppCompatActivity activity, TextureView textureView , OnDeviceListener onDeviceListener){
