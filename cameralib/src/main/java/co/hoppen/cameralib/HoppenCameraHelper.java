@@ -80,6 +80,10 @@ public class HoppenCameraHelper implements LifecycleEventObserver,OnUsbStatusLis
         return new HoppenCameraHelper(activity,textureView,onDeviceListener).getController();
     }
 
+    public static HoppenController createController(AppCompatActivity activity,TextureView textureView,OnDeviceListener onDeviceListener,List<DeviceFilter>list){
+        return new HoppenCameraHelper(activity,textureView,onDeviceListener,list).getController();
+    }
+
     @Override
     public void onStateChanged(@NonNull LifecycleOwner source, @NonNull Lifecycle.Event event) {
         if (event.equals(Lifecycle.Event.ON_CREATE)){
