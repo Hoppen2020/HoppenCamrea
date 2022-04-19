@@ -39,7 +39,7 @@ public class UsbMonitor{
     public void addDeviceFilter(boolean remove,List<DeviceFilter> list){
         if (filterList!=null){
             if (remove){
-                filterList.clear();
+                filterList = new ArrayList<>();
             }
             filterList.addAll(list);
         }

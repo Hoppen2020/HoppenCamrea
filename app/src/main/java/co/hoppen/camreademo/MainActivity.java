@@ -9,6 +9,11 @@ import android.view.View;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import java.util.ArrayList;
+import java.util.List;
+
+import co.hoppen.cameralib.DeviceFilter;
+import co.hoppen.cameralib.DeviceType;
 import co.hoppen.cameralib.ErrorCode;
 import co.hoppen.cameralib.HoppenCameraHelper;
 import co.hoppen.cameralib.HoppenController;
@@ -32,7 +37,10 @@ public class MainActivity extends AppCompatActivity implements OnDeviceListener 
         UVCCameraTextureView ttv_display = findViewById(R.id.ttv_display);
         tv_water = findViewById(R.id.tv_water);
         tv_status = findViewById(R.id.tv_status);
-        controller = HoppenCameraHelper.createController(this, ttv_display,this);
+        List<DeviceFilter>list = new ArrayList<>();
+        list.add(new DeviceFilter(2425,632, DeviceType.CAMERA));
+
+        controller = HoppenCameraHelper.createController(this, ttv_display,this,list);
         controller.setDeviceButton(new OnButtonListener() {
             @Override
             public void onButton(int state) {
