@@ -37,10 +37,10 @@ public class MainActivity extends AppCompatActivity implements OnDeviceListener 
         UVCCameraTextureView ttv_display = findViewById(R.id.ttv_display);
         tv_water = findViewById(R.id.tv_water);
         tv_status = findViewById(R.id.tv_status);
-        List<DeviceFilter>list = new ArrayList<>();
-        list.add(new DeviceFilter(2425,632, DeviceType.CAMERA));
+        //List<DeviceFilter>list = new ArrayList<>();
+//        list.add(new DeviceFilter(2425,632, DeviceType.CAMERA));
 
-        controller = HoppenCameraHelper.createController(this, ttv_display,this,list);
+        controller = HoppenCameraHelper.createController(this, ttv_display,this);
         controller.setDeviceButton(new OnButtonListener() {
             @Override
             public void onButton(int state) {

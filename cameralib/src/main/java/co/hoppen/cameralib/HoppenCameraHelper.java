@@ -17,6 +17,11 @@ import com.blankj.utilcode.util.LogUtils;
 
 import java.util.List;
 
+import co.hoppen.cameralib.tools.queue.ConnectMcuDeviceTask;
+import co.hoppen.cameralib.tools.queue.Task;
+import co.hoppen.cameralib.tools.queue.TaskCallBack;
+import co.hoppen.cameralib.tools.queue.TaskQueue;
+
 /**
  * Created by YangJianHui on 2021/3/15.
  */
@@ -26,11 +31,8 @@ public class HoppenCameraHelper implements LifecycleEventObserver,OnUsbStatusLis
     private AppCompatActivity appCompatActivity;
     private boolean addObserver;
     private OnDeviceListener onDeviceListener;
-
-//    private boolean stopTag = false;
-
+    private TaskQueue taskQueue;
     private HoppenCameraHelper(){
-
     }
 
     private HoppenController getController() {
@@ -47,6 +49,7 @@ public class HoppenCameraHelper implements LifecycleEventObserver,OnUsbStatusLis
             if (this.onDeviceListener==null){
                 if (activity instanceof OnDeviceListener) this.onDeviceListener = (OnDeviceListener) activity;
             }
+            taskQueue = new TaskQueue();
         }
     }
 
@@ -56,13 +59,14 @@ public class HoppenCameraHelper implements LifecycleEventObserver,OnUsbStatusLis
             UsbManager usbManager = (UsbManager) activity.getSystemService(Context.USB_SERVICE);
             textureView.setSurfaceTextureListener(this);
             usbMonitor = new UsbMonitor(usbManager,this);
-            if (list!=null&&list.size()>0){
+            if (list!=null && list.size()>0){
                 usbMonitor.addDeviceFilter(true,list);
             }
             controller = new HoppenController(usbManager,this);
             if (this.onDeviceListener==null){
                 if (activity instanceof OnDeviceListener) this.onDeviceListener = (OnDeviceListener) activity;
             }
+            taskQueue = new TaskQueue();
         }
         this.onDeviceListener = onDeviceListener;
     }
@@ -93,6 +97,7 @@ public class HoppenCameraHelper implements LifecycleEventObserver,OnUsbStatusLis
         }else if (event.equals(Lifecycle.Event.ON_STOP)){
             usbMonitor.unregister(appCompatActivity);
         }else if (event.equals(Lifecycle.Event.ON_DESTROY)){
+            taskQueue.cancel();
             controller.close();
         }else if (event.equals(Lifecycle.Event.ON_RESUME)){
             new Handler().postDelayed(() -> controller.getCameraDevice().startPreview(),500);
@@ -101,9 +106,19 @@ public class HoppenCameraHelper implements LifecycleEventObserver,OnUsbStatusLis
 
     @Override
     public void onConnecting(UsbDevice usbDevice, DeviceType type) {
-        if (controller!=null){
+        if (controller != null){
             if (type == DeviceType.MCU){
-                controller.getMcuDevice().onConnecting(usbDevice,type);
+                ConnectMcuDeviceTask connectMcuDeviceTask =
+                        new ConnectMcuDeviceTask((UsbManager) appCompatActivity.getSystemService(Context.USB_SERVICE),usbDevice);
+                taskQueue.addTask(connectMcuDeviceTask, new TaskQueue.currentTaskFinish() {
+                    @Override
+                    public void onFinish() {
+                        ConnectMcuDeviceTask.ConnectMcuInfo connectMcuInfo = connectMcuDeviceTask.getConnectMcuInfo();
+                        if (connectMcuInfo.isConform()){
+                            controller.getMcuDevice().onConnecting(connectMcuInfo);
+                        }
+                    }
+                });
             }else if (type == DeviceType.CAMERA){
                 controller.getCameraDevice().onConnecting(usbDevice,type);
                 if (onDeviceListener!=null)onDeviceListener.onConnected();
@@ -126,6 +141,7 @@ public class HoppenCameraHelper implements LifecycleEventObserver,OnUsbStatusLis
     @Override
     public void onSurfaceTextureAvailable(SurfaceTexture surface, int width, int height) {
         controller.setSurfaceTexture(surface);
+        // 只添加一次
         if (!addObserver){
             appCompatActivity.getLifecycle().addObserver(HoppenCameraHelper.this);
             addObserver = true;

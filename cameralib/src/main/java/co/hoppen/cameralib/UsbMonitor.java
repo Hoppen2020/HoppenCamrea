@@ -36,6 +36,11 @@ public class UsbMonitor{
         }
     }
 
+    /**
+     *
+     * @param remove 是否去除本身自带的设备
+     * @param list
+     */
     public void addDeviceFilter(boolean remove,List<DeviceFilter> list){
         if (filterList!=null){
             if (remove){
@@ -128,13 +133,10 @@ public class UsbMonitor{
     public List<UsbDevice> requestDeviceList(Context context){
         ArrayList<UsbDevice> usbDevices = new ArrayList<>(usbManager.getDeviceList().values());
 
-        for (int i = 0; i < usbDevices.size(); i++) {
-            LogUtils.e(usbDevices.toString());
-        }
         Iterator<UsbDevice> iterator = usbDevices.iterator();
         while (iterator.hasNext()){
             UsbDevice next = iterator.next();
-            //LogUtils.e(next.getProductId(),next.getVendorId());
+            LogUtils.e("request devices pid:"+next.getProductId()+"  vid:"+next.getVendorId());
             DeviceFilter hoppenDevice = deviceFilter(next);
             if (hoppenDevice!=null){
                 if (hasPermission(next)){
