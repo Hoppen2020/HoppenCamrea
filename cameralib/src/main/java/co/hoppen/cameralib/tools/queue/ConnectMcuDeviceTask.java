@@ -80,7 +80,7 @@ public class ConnectMcuDeviceTask extends Task{
                connectMcuInfo.CompatibleMode = mode;
                connectMcuInfo.conform = mode!=MODE_NONE;
 
-               LogUtils.e(mode);
+//               LogUtils.e(mode);
 
                if (mode==MODE_NONE){
                   try {
@@ -112,16 +112,13 @@ public class ConnectMcuDeviceTask extends Task{
       boolean success = sendInstructions(data,connectMcuInfo);
       if (success){
          byte[] bytes = readData(connectMcuInfo);
-         //LogUtils.e(new String(bytes));
          if (bytes!=null){
             try {
-               LogUtils.e(Arrays.toString(bytes));
                String judge = new String(bytes);
-               LogUtils.e(judge);
-//               if (judge.contains("Command-Invalid")){
-//                  mode = MODE_NONE;
-//               }else
-                  if (Arrays.equals(data,UsbInstructionUtils.USB_CAMERA_PRODUCT_CODE())){
+//               LogUtils.e(judge);
+               if (judge.contains("Command-Invalid")){
+                  mode = MODE_NONE;
+               }else if (Arrays.equals(data,UsbInstructionUtils.USB_CAMERA_PRODUCT_CODE())){
                   mode = MODE_AUTO;
                }else if (Arrays.equals(data,UsbInstructionUtils.USB_CAMERA_WATER_SINGLE_MODE())){
                   mode = MODE_SINGLE;
