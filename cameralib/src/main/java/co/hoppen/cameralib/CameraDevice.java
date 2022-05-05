@@ -29,7 +29,6 @@ public class CameraDevice extends HoppenDevice implements IButtonCallback {
     private UsbManager usbManager;
     private UVCCamera uvcCamera;
     private Surface surface;
-    private String deviceName;
     private OnButtonListener onDeviceButton;
     private int width = DEFAULT_WIDTH,height = DEFAULT_HEIGHT;
     private final static int DEFAULT_WIDTH = 800;
@@ -61,14 +60,6 @@ public class CameraDevice extends HoppenDevice implements IButtonCallback {
 
     @Override
     public void onConnecting(UsbDevice usbDevice, DeviceType type) {
-//        LogUtils.e(usbDevice.toString(),usbDevice.getDeviceName(),usbDevice.getProductName());
-        if (deviceName==null){
-            deviceName = usbDevice.getDeviceName();
-        }else {
-            if (!deviceName.equals(usbDevice.getDeviceName())){
-                return;
-            }
-        }
         cameraName = usbDevice.getProductName();
         if (cameraName==null){
             //可因usbhub导致 快速插拔 影响 无法获取device信息
@@ -112,11 +103,9 @@ public class CameraDevice extends HoppenDevice implements IButtonCallback {
 
     @Override
     public void onDisconnect(UsbDevice usbDevice, DeviceType type) {
-        if (deviceName!= null && deviceName.equals(usbDevice.getDeviceName())){
-            cameraName = "";
-            specialDevice = false;
-            this.closeDevice();
-        }
+        cameraName = "";
+        specialDevice = false;
+        this.closeDevice();
     }
 
     public void startPreview(){
@@ -285,18 +274,16 @@ public class CameraDevice extends HoppenDevice implements IButtonCallback {
     @Override
     protected void closeDevice() {
         try {
-            if (deviceName!=null){
-                deviceName = null;
-                if (uvcCamera != null) {
-                    uvcCamera.destroy();
-                    uvcCamera = null;
-                }
-                if (controlBlock!=null){
-                    controlBlock.close();
-                    controlBlock = null;
-                }
+            if (uvcCamera != null) {
+                uvcCamera.destroy();
+                uvcCamera = null;
+            }
+            if (controlBlock!=null){
+                controlBlock.close();
+                controlBlock = null;
             }
         } catch (Exception e) {
+            LogUtils.e(e.toString());
             e.printStackTrace();
         }
     }

@@ -42,7 +42,7 @@ public class ConnectMcuDeviceTask extends Task{
          UsbDevice usbDevice = connectMcuInfo.usbDevice;
          UsbDeviceConnection usbDeviceConnection = usbManager.openDevice(usbDevice);
          int interfaceCount = usbDevice.getInterfaceCount();
-         LogUtils.e("interface count :"+interfaceCount);
+         LogUtils.e("interface count :"+interfaceCount,usbDevice.toString());
          if (usbDeviceConnection!=null && interfaceCount>0) {
             UsbInterface usbInterface;
             UsbEndpoint epOut = null,epIn = null;
@@ -80,6 +80,8 @@ public class ConnectMcuDeviceTask extends Task{
                connectMcuInfo.CompatibleMode = mode;
                connectMcuInfo.conform = mode!=MODE_NONE;
 
+               LogUtils.e(mode);
+
                if (mode==MODE_NONE){
                   try {
                      usbDeviceConnection.releaseInterface(usbInterface);
@@ -110,11 +112,22 @@ public class ConnectMcuDeviceTask extends Task{
       boolean success = sendInstructions(data,connectMcuInfo);
       if (success){
          byte[] bytes = readData(connectMcuInfo);
+         //LogUtils.e(new String(bytes));
          if (bytes!=null){
-            if (Arrays.equals(data,UsbInstructionUtils.USB_CAMERA_PRODUCT_CODE())){
-               mode = MODE_AUTO;
-            }else if (Arrays.equals(data,UsbInstructionUtils.USB_CAMERA_WATER_SINGLE_MODE())){
-               mode = MODE_SINGLE;
+            try {
+               LogUtils.e(Arrays.toString(bytes));
+               String judge = new String(bytes);
+               LogUtils.e(judge);
+//               if (judge.contains("Command-Invalid")){
+//                  mode = MODE_NONE;
+//               }else
+                  if (Arrays.equals(data,UsbInstructionUtils.USB_CAMERA_PRODUCT_CODE())){
+                  mode = MODE_AUTO;
+               }else if (Arrays.equals(data,UsbInstructionUtils.USB_CAMERA_WATER_SINGLE_MODE())){
+                  mode = MODE_SINGLE;
+               }
+            }catch (Exception e){
+               LogUtils.e(e.toString());
             }
          }
       }

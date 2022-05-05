@@ -24,6 +24,12 @@
             </intent-filter>
         </activity>
 
+        <activity android:name=".QueueActivity"
+            android:screenOrientation="sensorLandscape"
+            >
+
+        </activity>
+
     </application>
 
 </manifest>

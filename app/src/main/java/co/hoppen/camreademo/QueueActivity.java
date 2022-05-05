@@ -1,5 +1,6 @@
 package co.hoppen.camreademo;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.view.View;
 
@@ -50,6 +51,11 @@ public class QueueActivity extends AppCompatActivity {
    public void addTask(View view){
 
 
+   }
+
+   public void back(View view){
+      startActivity(new Intent(this,MainActivity.class));
+      finish();
    }
 
 }

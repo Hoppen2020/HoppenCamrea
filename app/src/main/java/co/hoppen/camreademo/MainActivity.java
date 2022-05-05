@@ -2,6 +2,7 @@ package co.hoppen.camreademo;
 
 import androidx.appcompat.app.AppCompatActivity;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.os.Looper;
 import android.util.Log;
@@ -131,4 +132,12 @@ public class MainActivity extends AppCompatActivity implements OnDeviceListener 
 //            }
 //        },1000);
     }
+
+    public void test(View view){
+        controller.close();
+        startActivity(new Intent(this,QueueActivity.class));
+        finish();
+    }
+
+
 }

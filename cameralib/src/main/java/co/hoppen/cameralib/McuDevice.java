@@ -74,6 +74,7 @@ public class McuDevice extends HoppenDevice{
     }
 
     public synchronized void onConnecting(ConnectMcuDeviceTask.ConnectMcuInfo connectMcuInfo){
+        deviceName = connectMcuInfo.usbDevice.getDeviceName();
         currentMode = connectMcuInfo.getCompatibleMode();
         usbDeviceConnection = connectMcuInfo.getUsbDeviceConnection();
         usbInterface = connectMcuInfo.getUsbInterface();
