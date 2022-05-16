@@ -136,7 +136,7 @@ public class UsbMonitor{
         Iterator<UsbDevice> iterator = usbDevices.iterator();
         while (iterator.hasNext()){
             UsbDevice next = iterator.next();
-            LogUtils.e("request devices pid:"+next.getProductId()+"  vid:"+next.getVendorId());
+            LogUtils.e("request devices pid:"+next.getProductId()+"  vid:"+next.getVendorId(),next.toString());
             DeviceFilter hoppenDevice = deviceFilter(next);
             if (hoppenDevice!=null){
                 if (hasPermission(next)){

@@ -7,7 +7,7 @@ import android.view.View;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 
-import com.blankj.utilcode.util.LogUtils;
+//import com.blankj.utilcode.util.LogUtils;
 
 import co.hoppen.cameralib.tools.queue.ConnectMcuDeviceTask;
 import co.hoppen.cameralib.tools.queue.Task;
@@ -28,22 +28,22 @@ public class QueueActivity extends AppCompatActivity {
       taskQueue.setTaskQueueListener(new TaskQueueListener() {
          @Override
          public void onRunning() {
-            LogUtils.e("onRunning");
+//            LogUtils.e("onRunning");
          }
 
          @Override
          public void onCancel() {
-            LogUtils.e("onCancel");
+//            LogUtils.e("onCancel");
          }
 
          @Override
          public void onProgress(float progress, Task task) {
-            LogUtils.e("progress "+ progress);
+//            LogUtils.e("progress "+ progress);
          }
 
          @Override
          public void onFinish() {
-            LogUtils.e("onFinish");
+//            LogUtils.e("onFinish");
          }
       });
    }

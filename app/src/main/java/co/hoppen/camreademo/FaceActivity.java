@@ -12,8 +12,8 @@ import android.widget.Toast;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 
-import com.blankj.utilcode.util.ImageUtils;
-import com.blankj.utilcode.util.LogUtils;
+//import com.blankj.utilcode.util.ImageUtils;
+//import com.blankj.utilcode.util.LogUtils;
 
 import java.io.File;
 import java.io.FileOutputStream;
@@ -119,11 +119,11 @@ public class FaceActivity extends BaseActivity implements OnDeviceListener, View
    public boolean onLongClick(View v) {
       Bitmap bitmap = textureView.getBitmap(1920,1080);
 //      faceView.setImageBitmap(bitmap);
-      LogUtils.e(bitmap.getWidth(),bitmap.getHeight());
+//      LogUtils.e(bitmap.getWidth(),bitmap.getHeight());
+//
+//      Bitmap rotate = ImageUtils.rotate(bitmap, 90, bitmap.getWidth() / 2, bitmap.getWidth() / 2);
 
-      Bitmap rotate = ImageUtils.rotate(bitmap, 90, bitmap.getWidth() / 2, bitmap.getWidth() / 2);
-
-      save(rotate);
+//      save(rotate);
       return true;
    }
 
