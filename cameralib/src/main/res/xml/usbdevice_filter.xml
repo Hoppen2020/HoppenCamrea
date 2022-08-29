@@ -17,5 +17,9 @@
     <!-- 虹膜-->
     <usb-device vendorId="2425" productId="632" deviceType = "2" />
 
+    <!--A133 读取4d2sx 设备-->
+    <usb-device vendorId="1409" productId="5120" deviceType = "2" />
+
+<!--    <usb-device vendorId="3034" productId="33106" deviceType = "2" />-->
 
 </usb>

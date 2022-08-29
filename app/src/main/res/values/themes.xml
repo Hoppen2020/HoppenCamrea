@@ -13,4 +13,43 @@
         <item name="android:statusBarColor" tools:targetApi="l">?attr/colorPrimaryVariant</item>
         <!-- Customize your theme here. -->
     </style>
+
+    <!--默认的Dialog样式-->
+    <style name="CommonDialog" parent="@android:style/Theme.Dialog">
+        <!--边框-->
+        <item name="android:windowFrame">@null</item>
+        <!--浮动-->
+        <item name="android:windowIsFloating">true</item>
+        <!--透明-->
+        <item name="android:windowIsTranslucent">false</item>
+        <!--标题-->
+        <item name="android:windowNoTitle">true</item>
+        <!--背景颜色-->
+        <item name="android:background">@android:color/transparent</item>
+        <!--背景颜色-->
+        <item name="android:windowBackground">@android:color/transparent</item>
+        <!--背景变暗-->
+        <item name="android:backgroundDimEnabled">true</item>
+
+
+        <item name="textAllCaps">false</item>
+    </style>
+
+    <style name="CommonDialogLight" parent="@android:style/Theme.Dialog">
+        <!--边框-->
+        <item name="android:windowFrame">@null</item>
+        <!--浮动-->
+        <item name="android:windowIsFloating">true</item>
+        <!--透明-->
+        <item name="android:windowIsTranslucent">false</item>
+        <!--标题-->
+        <item name="android:windowNoTitle">true</item>
+        <!--背景颜色-->
+        <item name="android:background">@android:color/transparent</item>
+        <!--背景颜色-->
+        <item name="android:windowBackground">@android:color/transparent</item>
+        <!--背景变暗-->
+        <item name="android:backgroundDimEnabled">false</item>
+
+    </style>
 </resources>

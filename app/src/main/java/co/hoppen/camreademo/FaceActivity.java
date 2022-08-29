@@ -121,7 +121,7 @@ public class FaceActivity extends BaseActivity implements OnDeviceListener, View
 //      faceView.setImageBitmap(bitmap);
 //      LogUtils.e(bitmap.getWidth(),bitmap.getHeight());
 //
-//      Bitmap rotate = ImageUtils.rotate(bitmap, 90, bitmap.getWidth() / 2, bitmap.getWidth() / 2);
+      //Bitmap rotate = ImageUtils.rotate(bitmap, 90, bitmap.getWidth() / 2, bitmap.getWidth() / 2);
 
 //      save(rotate);
       return true;

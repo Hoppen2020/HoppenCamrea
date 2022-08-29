@@ -1,0 +1,13 @@
+<resources xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <style name="loading_out_progressbar">
+        <item name="android:indeterminateDrawable">@anim/anim_loading_out_ring</item>
+        <item name="android:animationDuration">200</item>
+    </style>
+
+    <style name="loading_int_progressbar">
+        <item name="android:indeterminateDrawable">@anim/anim_loading_in_ring</item>
+        <item name="android:animationDuration">100</item>
+    </style>
+
+</resources>

@@ -5,6 +5,7 @@ import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
+import android.hardware.usb.UsbConstants;
 import android.hardware.usb.UsbDevice;
 import android.hardware.usb.UsbManager;
 import android.util.Log;
@@ -69,7 +70,7 @@ public class UsbMonitor{
                             ||action.equals(UsbManager.ACTION_USB_DEVICE_DETACHED)
                             ||action.equals(USB_PERMISSION)){
                         UsbDevice usbDevice = intent.getParcelableExtra(UsbManager.EXTRA_DEVICE);
-                        //LogUtils.e(usbDevice.toString());
+                        LogUtils.e(usbDevice.toString(),usbDevice.getDeviceClass());
                         DeviceFilter hoppenDevice = deviceFilter(usbDevice);
                         if (hoppenDevice!=null){
                             if (action.equals(UsbManager.ACTION_USB_DEVICE_ATTACHED)){
@@ -139,6 +140,7 @@ public class UsbMonitor{
             LogUtils.e("request devices pid:"+next.getProductId()+"  vid:"+next.getVendorId(),next.toString());
             DeviceFilter hoppenDevice = deviceFilter(next);
             if (hoppenDevice!=null){
+                LogUtils.e(next.toString());
                 if (hasPermission(next)){
                     onCameraListener.onConnecting(next,hoppenDevice.type);
                 }else {

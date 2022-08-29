@@ -63,7 +63,11 @@ public class CameraDevice extends HoppenDevice implements IButtonCallback {
         cameraName = usbDevice.getProductName();
         if (cameraName==null){
             //可因usbhub导致 快速插拔 影响 无法获取device信息
-            LogUtils.e(usbDevice.toString());
+//            LogUtils.e(usbDevice.toString());
+//            if (usbDevice.getVendorId()==1409&&usbDevice.getProductId()==5120){
+//                cameraName = "1409";
+//            }else {
+//            }
             if (onErrorListener!=null)onErrorListener.onError(ErrorCode.DEVICE_INFO_MISSING);
             cameraName = "";
             specialDevice = false;
@@ -89,6 +93,7 @@ public class CameraDevice extends HoppenDevice implements IButtonCallback {
 //                    },FRAME_FORMAT_MJPEG);
                     startPreview();
                 } catch (Exception e) {
+                    LogUtils.e(e.toString());
                     e.printStackTrace();
                 }
             }else {
@@ -274,6 +279,7 @@ public class CameraDevice extends HoppenDevice implements IButtonCallback {
     @Override
     protected void closeDevice() {
         try {
+            stopPreview();
             if (uvcCamera != null) {
                 uvcCamera.destroy();
                 uvcCamera = null;
@@ -320,7 +326,7 @@ public class CameraDevice extends HoppenDevice implements IButtonCallback {
         specialDevice = false;
         algorithm = false;
         face = false;
-        LogUtils.e(productName);
+//        LogUtils.e(productName);
         if (!StringUtils.isEmpty(productName)){
             if (productName.equals("WAX-04+80")){
                 width = 640;

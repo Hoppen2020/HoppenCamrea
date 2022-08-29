@@ -73,7 +73,8 @@ public class MainActivity extends AppCompatActivity implements OnDeviceListener 
         Log.e("onConnected",""+ (Looper.getMainLooper().getThread() == Thread.currentThread()));
         tv_status.setText("已连接");
         ((TextView)findViewById(R.id.tv_id)).setText(""+controller.getDeviceName());
-        //Log.e("@@@@@@@@",""+controller.getSupportedPreviewSizes().toString());
+        Log.e("@@@@@@@@",""+controller.getSupportedPreviewSizes().toString());
+//        controller.getSupportedPreviewSizes();
     }
 
     @Override
@@ -137,6 +138,11 @@ public class MainActivity extends AppCompatActivity implements OnDeviceListener 
         controller.close();
         startActivity(new Intent(this,QueueActivity.class));
         finish();
+    }
+
+    public void onTest(View view){
+        ScanDialog dialog = new ScanDialog(this);
+        dialog.show();
     }
 
 

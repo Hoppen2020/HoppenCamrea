@@ -10,16 +10,9 @@ import java.util.List;
  * Created by YangJianHui on 2021/3/17.
  */
 public interface Controller {
-
-        //void setPreviewSize(int width,int height);
-
         Size getPreviewSize();
 
         List<Size> getSupportedPreviewSizes();
-
-       // void startPreview();
-
-       // void stopPreview();
 
         void setSurfaceTexture(SurfaceTexture surfaceTexture);
 
@@ -34,4 +27,11 @@ public interface Controller {
         void setContrast(int contrast);
 
         void setSaturation(int saturation);
+
+        // void startPreview();
+
+        // void stopPreview();
+
+        // void setPreviewSize(int width,int height);
+
 }

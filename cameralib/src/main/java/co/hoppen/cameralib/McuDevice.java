@@ -121,6 +121,7 @@ public class McuDevice extends HoppenDevice{
                 .subscribe(new Consumer<Instruction>() {
             @Override
             public void accept(Instruction instruction) throws Throwable {
+                LogUtils.e(currentMode,Instruction.WATER);
                 if ((currentMode==MODE_NONE || currentMode==MODE_SINGLE)
                         &&
                         instruction != Instruction.WATER) return;
@@ -128,6 +129,7 @@ public class McuDevice extends HoppenDevice{
                     waterForMainThread(-1);
                     return;
                 }
+
                 byte [] bytes = null;
                 switch (instruction){
                     case LIGHT_CLOSE:

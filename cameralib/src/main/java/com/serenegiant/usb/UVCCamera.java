@@ -171,6 +171,9 @@ public class UVCCamera {
     protected int mAnalogVideoLockStateMin, mAnalogVideoLockStateMax, mAnalogVideoLockStateDef;
     // until here
 
+
+    //public int miConnStatus = 0; // add by liml 链接状态： 0 初始化； 1 链接； 2 链接断开
+
     /**
      * the sonctructor of this class should be call within the thread that has a looper
      * (UI thread or a thread that called Looper.prepare)
@@ -178,6 +181,7 @@ public class UVCCamera {
     public UVCCamera() {
         mNativePtr = nativeCreate();
         mSupportedSize = null;
+        //miConnStatus = 0;
     }
 
     /**
@@ -229,7 +233,9 @@ public class UVCCamera {
     public synchronized void close() {
         stopPreview();
         if (mNativePtr != 0) {
-            nativeRelease(mNativePtr);
+//            if (miConnStatus == 1) { // add if by liml
+                nativeRelease(mNativePtr);
+//            }
             // mNativePtr = 0;
         }
         if (mControlBlock != null) {
@@ -403,7 +409,9 @@ public class UVCCamera {
     public synchronized void stopPreview() {
         setFrameCallback(null, 0);
         if (mControlBlock != null) {
-            nativeStopPreview(mNativePtr);
+//            if (miConnStatus == 1) { // add if by liml
+                nativeStopPreview(mNativePtr);
+//            }
         }
     }
 

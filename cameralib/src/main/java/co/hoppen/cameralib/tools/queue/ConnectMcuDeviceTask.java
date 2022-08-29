@@ -10,12 +10,9 @@ import android.hardware.usb.UsbManager;
 import com.blankj.utilcode.util.LogUtils;
 
 import java.util.Arrays;
-import java.util.concurrent.TimeUnit;
 
 import co.hoppen.cameralib.CompatibleMode;
 import co.hoppen.cameralib.UsbInstructionUtils;
-import io.reactivex.rxjava3.core.Observable;
-import io.reactivex.rxjava3.functions.Consumer;
 
 import static co.hoppen.cameralib.CompatibleMode.MODE_AUTO;
 import static co.hoppen.cameralib.CompatibleMode.MODE_NONE;
@@ -50,7 +47,7 @@ public class ConnectMcuDeviceTask extends Task{
             usbInterface = usbDevice.getInterface(interfaceCount - 1);
 
             boolean claimInterface = usbDeviceConnection.claimInterface(usbInterface, false);
-            LogUtils.e(claimInterface);
+//            LogUtils.e(claimInterface);
             if (claimInterface) {
                //设置波特率等设置
                setConfig(usbDeviceConnection, 9600, 8, 1, 0);
@@ -77,10 +74,10 @@ public class ConnectMcuDeviceTask extends Task{
                if (mode != MODE_AUTO){
                   mode = discernMode(UsbInstructionUtils.USB_CAMERA_WATER_SINGLE_MODE(),connectMcuInfo);
                }
-               connectMcuInfo.CompatibleMode = mode;
+               connectMcuInfo.compatibleMode = mode;
                connectMcuInfo.conform = mode!=MODE_NONE;
 
-//               LogUtils.e(mode);
+//               LogUtils.e(connectMcuInfo.conform,mode);
 
                if (mode==MODE_NONE){
                   try {
@@ -110,12 +107,12 @@ public class ConnectMcuDeviceTask extends Task{
    private CompatibleMode discernMode(byte [] data,ConnectMcuInfo connectMcuInfo){
       CompatibleMode mode = CompatibleMode.MODE_NONE;
       boolean success = sendInstructions(data,connectMcuInfo);
+//      LogUtils.e(success);
       if (success){
          byte[] bytes = readData(connectMcuInfo);
          if (bytes!=null){
             try {
                String judge = new String(bytes);
-//               LogUtils.e(judge);
                if (judge.contains("Command-Invalid")){
                   mode = MODE_NONE;
                }else if (Arrays.equals(data,UsbInstructionUtils.USB_CAMERA_PRODUCT_CODE())){
@@ -134,6 +131,7 @@ public class ConnectMcuDeviceTask extends Task{
    private byte[] readData(ConnectMcuInfo connectMcuInfo){
       final byte[] data = new byte[128];
       int cnt = connectMcuInfo.usbDeviceConnection.bulkTransfer(connectMcuInfo.epIn, data, data.length, 300);
+//      LogUtils.e(cnt);
       if (cnt!=-1){
          byte[] bytes = Arrays.copyOfRange(data, 0, cnt);
          return bytes;
@@ -308,7 +306,7 @@ public class ConnectMcuDeviceTask extends Task{
       private UsbEndpoint epOut = null,epIn = null;
       private UsbDeviceConnection usbDeviceConnection = null;
       private boolean conform = false;
-      private co.hoppen.cameralib.CompatibleMode CompatibleMode;
+      private co.hoppen.cameralib.CompatibleMode compatibleMode;
 
       public ConnectMcuInfo(UsbManager usbManager,UsbDevice usbDevice){
          this.usbManager = usbManager;
@@ -336,7 +334,7 @@ public class ConnectMcuDeviceTask extends Task{
       }
 
       public co.hoppen.cameralib.CompatibleMode getCompatibleMode() {
-         return CompatibleMode;
+         return compatibleMode;
       }
    }
 
