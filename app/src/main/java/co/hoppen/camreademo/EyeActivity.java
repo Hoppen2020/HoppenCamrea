@@ -8,13 +8,12 @@ import android.widget.ImageView;
 import android.widget.Toast;
 
 import androidx.annotation.Nullable;
-import androidx.appcompat.app.AppCompatActivity;
 
 import co.hoppen.cameralib.ErrorCode;
 import co.hoppen.cameralib.HoppenCameraHelper;
 import co.hoppen.cameralib.HoppenController;
-import co.hoppen.cameralib.OnButtonListener;
-import co.hoppen.cameralib.OnDeviceListener;
+import co.hoppen.cameralib.CallBack.OnButtonListener;
+import co.hoppen.cameralib.CallBack.OnDeviceListener;
 import co.hoppen.cameralib.widget.UVCCameraTextureView;
 
 /**

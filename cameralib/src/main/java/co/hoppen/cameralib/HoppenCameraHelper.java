@@ -1,6 +1,5 @@
 package co.hoppen.cameralib;
 
-import android.app.Activity;
 import android.content.Context;
 import android.graphics.SurfaceTexture;
 import android.hardware.usb.UsbDevice;
@@ -14,20 +13,18 @@ import androidx.lifecycle.Lifecycle;
 import androidx.lifecycle.LifecycleEventObserver;
 import androidx.lifecycle.LifecycleOwner;
 
-import com.blankj.utilcode.util.ActivityUtils;
-import com.blankj.utilcode.util.LogUtils;
-
 import java.util.List;
 
+import co.hoppen.cameralib.CallBack.OnDeviceListener;
+import co.hoppen.cameralib.CallBack.OnErrorListener;
+import co.hoppen.cameralib.CallBack.OnUsbStatusListener;
 import co.hoppen.cameralib.tools.queue.ConnectMcuDeviceTask;
-import co.hoppen.cameralib.tools.queue.Task;
-import co.hoppen.cameralib.tools.queue.TaskCallBack;
 import co.hoppen.cameralib.tools.queue.TaskQueue;
 
 /**
  * Created by YangJianHui on 2021/3/15.
  */
-public class HoppenCameraHelper implements LifecycleEventObserver,OnUsbStatusListener,TextureView.SurfaceTextureListener,OnErrorListener {
+public class HoppenCameraHelper implements LifecycleEventObserver, OnUsbStatusListener,TextureView.SurfaceTextureListener, OnErrorListener {
     private UsbMonitor usbMonitor;
     private HoppenController controller;
     private AppCompatActivity appCompatActivity;
@@ -44,10 +41,9 @@ public class HoppenCameraHelper implements LifecycleEventObserver,OnUsbStatusLis
     private HoppenCameraHelper(AppCompatActivity activity, TextureView textureView){
         if (activity!=null){
             this.appCompatActivity = activity;
-            UsbManager usbManager = (UsbManager) activity.getSystemService(Context.USB_SERVICE);
             textureView.setSurfaceTextureListener(this);
-            usbMonitor = new UsbMonitor(usbManager,this);
-            controller = new HoppenController(usbManager,this);
+            usbMonitor = new UsbMonitor(this);
+            controller = new HoppenController(this);
             if (this.onDeviceListener==null){
                 if (activity instanceof OnDeviceListener) this.onDeviceListener = (OnDeviceListener) activity;
             }
@@ -58,13 +54,13 @@ public class HoppenCameraHelper implements LifecycleEventObserver,OnUsbStatusLis
     private HoppenCameraHelper(AppCompatActivity activity, TextureView textureView, OnDeviceListener onDeviceListener, List<DeviceFilter> list){
         if (activity!=null){
             this.appCompatActivity = activity;
-            UsbManager usbManager = (UsbManager) activity.getSystemService(Context.USB_SERVICE);
+            //UsbManager usbManager = (UsbManager) activity.getSystemService(Context.USB_SERVICE);
             textureView.setSurfaceTextureListener(this);
-            usbMonitor = new UsbMonitor(usbManager,this);
+            usbMonitor = new UsbMonitor(this);
             if (list!=null && list.size()>0){
                 usbMonitor.addDeviceFilter(true,list);
             }
-            controller = new HoppenController(usbManager,this);
+            controller = new HoppenController(this);
             if (this.onDeviceListener==null){
                 if (activity instanceof OnDeviceListener) this.onDeviceListener = (OnDeviceListener) activity;
             }

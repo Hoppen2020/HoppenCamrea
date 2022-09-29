@@ -1,6 +1,5 @@
 package co.hoppen.cameralib;
 
-import android.hardware.usb.UsbConstants;
 import android.hardware.usb.UsbDevice;
 import android.hardware.usb.UsbDeviceConnection;
 import android.hardware.usb.UsbEndpoint;
@@ -8,11 +7,12 @@ import android.hardware.usb.UsbInterface;
 import android.hardware.usb.UsbManager;
 
 import com.blankj.utilcode.util.LogUtils;
-import com.blankj.utilcode.util.TimeUtils;
 
 import java.util.Arrays;
 import java.util.concurrent.TimeUnit;
 
+import co.hoppen.cameralib.CallBack.OnInfoListener;
+import co.hoppen.cameralib.CallBack.OnWaterListener;
 import co.hoppen.cameralib.tools.queue.ConnectMcuDeviceTask;
 import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers;
 import io.reactivex.rxjava3.core.Observable;

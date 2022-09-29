@@ -1,26 +1,31 @@
 package co.hoppen.cameralib;
 
+import android.content.Context;
 import android.graphics.SurfaceTexture;
 import android.hardware.usb.UsbManager;
 import android.view.Surface;
 
+import com.blankj.utilcode.util.Utils;
 import com.serenegiant.usb.Size;
 
 import java.util.List;
 
-import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers;
-import io.reactivex.rxjava3.core.Observable;
-import io.reactivex.rxjava3.functions.Consumer;
+import co.hoppen.cameralib.CallBack.Controller;
+import co.hoppen.cameralib.CallBack.OnButtonListener;
+import co.hoppen.cameralib.CallBack.OnErrorListener;
+import co.hoppen.cameralib.CallBack.OnInfoListener;
+import co.hoppen.cameralib.CallBack.OnWaterListener;
 
 /**
  * Created by YangJianHui on 2021/3/17.
  */
-public class HoppenController implements Controller{
+public class HoppenController implements Controller {
     private CameraDevice cameraDevice;
     private McuDevice mcuDevice;
 
 
-    public HoppenController(UsbManager usbManager,OnErrorListener onErrorListener){
+    public HoppenController(OnErrorListener onErrorListener){
+        UsbManager usbManager = (UsbManager) Utils.getApp().getSystemService(Context.USB_SERVICE);
         cameraDevice = new CameraDevice(usbManager,onErrorListener);
         mcuDevice = new McuDevice(usbManager);
     }

@@ -1,10 +1,12 @@
-package co.hoppen.cameralib;
+package co.hoppen.cameralib.CallBack;
 
 import android.graphics.SurfaceTexture;
 
 import com.serenegiant.usb.Size;
 
 import java.util.List;
+
+import co.hoppen.cameralib.Instruction;
 
 /**
  * Created by YangJianHui on 2021/3/17.

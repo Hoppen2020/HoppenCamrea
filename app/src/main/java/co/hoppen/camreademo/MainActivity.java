@@ -10,19 +10,14 @@ import android.view.View;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import java.util.ArrayList;
-import java.util.List;
-
-import co.hoppen.cameralib.DeviceFilter;
-import co.hoppen.cameralib.DeviceType;
 import co.hoppen.cameralib.ErrorCode;
 import co.hoppen.cameralib.HoppenCameraHelper;
 import co.hoppen.cameralib.HoppenController;
 import co.hoppen.cameralib.Instruction;
-import co.hoppen.cameralib.OnButtonListener;
-import co.hoppen.cameralib.OnDeviceListener;
-import co.hoppen.cameralib.OnInfoListener;
-import co.hoppen.cameralib.OnWaterListener;
+import co.hoppen.cameralib.CallBack.OnButtonListener;
+import co.hoppen.cameralib.CallBack.OnDeviceListener;
+import co.hoppen.cameralib.CallBack.OnInfoListener;
+import co.hoppen.cameralib.CallBack.OnWaterListener;
 import co.hoppen.cameralib.widget.UVCCameraTextureView;
 
 public class MainActivity extends AppCompatActivity implements OnDeviceListener {

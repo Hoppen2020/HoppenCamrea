@@ -1,5 +1,6 @@
 package co.hoppen.camreademo;
 
+import android.content.Intent;
 import android.content.res.AssetManager;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
@@ -10,7 +11,6 @@ import android.widget.ImageView;
 import android.widget.Toast;
 
 import androidx.annotation.Nullable;
-import androidx.appcompat.app.AppCompatActivity;
 
 //import com.blankj.utilcode.util.ImageUtils;
 //import com.blankj.utilcode.util.LogUtils;
@@ -19,15 +19,12 @@ import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.util.ArrayList;
-import java.util.List;
 
-import co.hoppen.cameralib.DeviceFilter;
 import co.hoppen.cameralib.ErrorCode;
 import co.hoppen.cameralib.HoppenCameraHelper;
 import co.hoppen.cameralib.HoppenController;
 import co.hoppen.cameralib.Instruction;
-import co.hoppen.cameralib.OnDeviceListener;
+import co.hoppen.cameralib.CallBack.OnDeviceListener;
 import co.hoppen.cameralib.widget.UVCCameraTextureView;
 
 /**
@@ -102,6 +99,11 @@ public class FaceActivity extends BaseActivity implements OnDeviceListener, View
       if (hoppenController!=null)hoppenController.sendInstructions(Instruction.LIGHT_CLOSE);
    }
 
+   public void t(View view){
+      startActivity(new Intent(this,NullActivity.class));
+      finish();
+   }
+
    private Bitmap getImageFromAssetsFile(String fileName) {
       Bitmap image = null;
       AssetManager am = getResources().getAssets();
@@ -122,7 +124,6 @@ public class FaceActivity extends BaseActivity implements OnDeviceListener, View
 //      LogUtils.e(bitmap.getWidth(),bitmap.getHeight());
 //
       //Bitmap rotate = ImageUtils.rotate(bitmap, 90, bitmap.getWidth() / 2, bitmap.getWidth() / 2);
-
 //      save(rotate);
       return true;
    }
@@ -133,7 +134,7 @@ public class FaceActivity extends BaseActivity implements OnDeviceListener, View
 
    private void save(Bitmap bitmap){
       try {
-         File parentFile = new File(Environment.getExternalStorageDirectory().getPath()+"/test");
+         File parentFile = new File(Environment.getExternalStorageDirectory().getPath()+"/test2");
          if (!parentFile.exists()) {
             parentFile.mkdirs();
          }

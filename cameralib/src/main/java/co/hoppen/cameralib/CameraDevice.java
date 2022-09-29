@@ -8,18 +8,18 @@ import com.blankj.utilcode.util.LogUtils;
 import com.blankj.utilcode.util.StringUtils;
 import com.blankj.utilcode.util.ThreadUtils;
 import com.serenegiant.usb.IButtonCallback;
-import com.serenegiant.usb.IFrameCallback;
 import com.serenegiant.usb.Size;
 import com.serenegiant.usb.UVCCamera;
 
-import java.nio.ByteBuffer;
 import java.util.List;
 
+import co.hoppen.cameralib.CallBack.OnButtonListener;
+import co.hoppen.cameralib.CallBack.OnErrorListener;
+import co.hoppen.cameralib.CallBack.OnInfoListener;
+import co.hoppen.cameralib.CallBack.OnWaterListener;
 import io.reactivex.rxjava3.android.schedulers.AndroidSchedulers;
 import io.reactivex.rxjava3.core.Observable;
 import io.reactivex.rxjava3.functions.Consumer;
-
-import static com.serenegiant.usb.UVCCamera.FRAME_FORMAT_MJPEG;
 
 /**
  * Created by YangJianHui on 2021/3/16.
@@ -234,7 +234,7 @@ public class CameraDevice extends HoppenDevice implements IButtonCallback {
                                     send = uvcCamera.nativeXuWrite(writeCmd, writeAddr, pdat.length, pdat);
                                     break;
                                 case LIGHT_UV://4
-                                    pdat[2] = 0x11;//0x11
+                                    pdat[2] = 0x14;//0x11
                                     pdat[3] = (byte) 0xff;
                                     send = uvcCamera.nativeXuWrite(writeCmd, writeAddr, pdat.length, pdat);
                                     break;
@@ -244,17 +244,17 @@ public class CameraDevice extends HoppenDevice implements IButtonCallback {
                                     send = uvcCamera.nativeXuWrite(writeCmd, writeAddr, pdat.length, pdat);
                                     break;
                                 case LIGHT_POLARIZED://3
-                                    pdat[2] = 0x13;
-                                    pdat[3] = (byte) 0xff;
-                                    send = uvcCamera.nativeXuWrite(writeCmd, writeAddr, pdat.length, pdat);
-                                    break;
-                                case LIGHT_BALANCED_POLARIZED:
                                     pdat[2] = 0x12;
                                     pdat[3] = (byte) 0xff;
                                     send = uvcCamera.nativeXuWrite(writeCmd, writeAddr, pdat.length, pdat);
                                     break;
+                                case LIGHT_BALANCED_POLARIZED:
+                                    pdat[2] = 0x13;
+                                    pdat[3] = (byte) 0xff;
+                                    send = uvcCamera.nativeXuWrite(writeCmd, writeAddr, pdat.length, pdat);
+                                    break;
                                 case LIGHT_WOOD:
-                                    pdat[2] = 0x14;//
+                                    pdat[2] = 0x11;//
                                     pdat[3] = (byte) 0xff;
                                     send = uvcCamera.nativeXuWrite(writeCmd, writeAddr, pdat.length, pdat);
                                     break;
@@ -279,6 +279,7 @@ public class CameraDevice extends HoppenDevice implements IButtonCallback {
     @Override
     protected void closeDevice() {
         try {
+            onErrorListener=null;
             stopPreview();
             if (uvcCamera != null) {
                 uvcCamera.destroy();

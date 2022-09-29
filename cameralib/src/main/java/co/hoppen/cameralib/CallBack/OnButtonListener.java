@@ -1,4 +1,4 @@
-package co.hoppen.cameralib;
+package co.hoppen.cameralib.CallBack;
 
 import com.serenegiant.usb.IButtonCallback;
 

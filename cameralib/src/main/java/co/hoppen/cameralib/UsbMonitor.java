@@ -5,18 +5,19 @@ import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
-import android.hardware.usb.UsbConstants;
 import android.hardware.usb.UsbDevice;
 import android.hardware.usb.UsbManager;
-import android.util.Log;
 
 import com.blankj.utilcode.util.LogUtils;
+import com.blankj.utilcode.util.Utils;
 
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+
+import co.hoppen.cameralib.CallBack.OnUsbStatusListener;
 
 /**
  * Created by YangJianHui on 2021/1/19.
@@ -26,15 +27,24 @@ public class UsbMonitor{
     private BroadcastReceiver usbReceiver;
     private UsbManager usbManager;
     private List<DeviceFilter> filterList;
-    private OnUsbStatusListener onCameraListener;
+    private OnUsbStatusListener onUsbStatusListener;
     private Map<String,UsbDevice> doubleCheckMap = new HashMap<>();//某些平板厂商需要用到doublecheck
 
-    public UsbMonitor(UsbManager usbManager,OnUsbStatusListener onCameraListener){
-        if (usbManager!=null && onCameraListener!=null){
-            this.onCameraListener = onCameraListener;
-            this.usbManager = usbManager;
+    public UsbMonitor(OnUsbStatusListener onUsbStatusListener){
+        usbManager = (UsbManager) Utils.getApp().getSystemService(Context.USB_SERVICE);
+        if (onUsbStatusListener!=null){
+            this.onUsbStatusListener = onUsbStatusListener;
             filterList = DeviceFilter.getDeviceFilters();
         }
+
+    }
+
+    public UsbMonitor(){
+        usbManager = (UsbManager) Utils.getApp().getSystemService(Context.USB_SERVICE);
+    }
+
+    public void setOnUsbStatusListener(OnUsbStatusListener onUsbStatusListener) {
+        this.onUsbStatusListener = onUsbStatusListener;
     }
 
     /**
@@ -75,17 +85,17 @@ public class UsbMonitor{
                         if (hoppenDevice!=null){
                             if (action.equals(UsbManager.ACTION_USB_DEVICE_ATTACHED)){
                                 if (hasPermission(usbDevice)){//为了适配某些厂商 在插入时就直接有权限
-                                    onCameraListener.onConnecting(usbDevice,hoppenDevice.type);
+                                    onUsbStatusListener.onConnecting(usbDevice,hoppenDevice.type);
                                 }else {
                                     doubleCheckMap.put(usbDevice.getDeviceName(),usbDevice);
                                     requestPermission(context,usbDevice);
                                 }
                             }else if (action.equals(UsbManager.ACTION_USB_DEVICE_DETACHED)){
-                                onCameraListener.onDisconnect(usbDevice,hoppenDevice.type);
+                                onUsbStatusListener.onDisconnect(usbDevice,hoppenDevice.type);
                             }else if (action.equals(USB_PERMISSION)){
                                 if (intent.getBooleanExtra(UsbManager.EXTRA_PERMISSION_GRANTED, false)){
                                     doubleCheckMap.remove(usbDevice.getDeviceName());
-                                    onCameraListener.onConnecting(usbDevice,hoppenDevice.type);
+                                    onUsbStatusListener.onConnecting(usbDevice,hoppenDevice.type);
                                     doubleCheckPermission(context);
                                 }else {
                                     requestPermission(context,usbDevice);
@@ -142,7 +152,7 @@ public class UsbMonitor{
             if (hoppenDevice!=null){
                 LogUtils.e(next.toString());
                 if (hasPermission(next)){
-                    onCameraListener.onConnecting(next,hoppenDevice.type);
+                    onUsbStatusListener.onConnecting(next,hoppenDevice.type);
                 }else {
                     doubleCheckMap.put(next.getDeviceName(),next);
                     requestPermission(context,next);
