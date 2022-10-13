@@ -17,9 +17,7 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.CamreaDemo">
 
-        <activity android:name=".FaceActivity"
-
-            android:screenOrientation="sensorPortrait"
+        <activity android:name=".MainActivity"
             >
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
@@ -27,13 +25,11 @@
             </intent-filter>
         </activity>
 
-        <activity android:name=".QueueActivity"
-            android:screenOrientation="sensorLandscape"
-            >
-
-        </activity>
-
         <activity android:name=".NullActivity"/>
+
+        <activity android:name=".FaceActivity" android:screenOrientation="sensorPortrait" />
+
+        <activity android:name=".NewDeviceActivity" android:screenOrientation="sensorLandscape" />
 
 
     </application>

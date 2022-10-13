@@ -1,119 +1,204 @@
 package co.hoppen.cameralib;
 
 import android.content.Context;
+import android.graphics.SurfaceTexture;
+import android.view.TextureView;
 
 import androidx.annotation.NonNull;
 import androidx.lifecycle.Lifecycle;
 import androidx.lifecycle.LifecycleEventObserver;
 import androidx.lifecycle.LifecycleOwner;
 
-import co.hoppen.cameralib.CallBack.OnCaptureListener;
+import com.blankj.utilcode.util.LogUtils;
+import com.serenegiant.usb.IButtonCallback;
+
+import java.lang.ref.WeakReference;
+
 import co.hoppen.cameralib.CallBack.OnDeviceListener;
 import co.hoppen.cameralib.CallBack.OnInfoListener;
-import co.hoppen.cameralib.CallBack.OnWaterListener;
+import co.hoppen.cameralib.CallBack.OnMoistureListener;
+import co.hoppen.cameralib.CallBack.NotifyListener;
+import co.hoppen.cameralib.widget.UVCCameraTextureView;
 
 import static com.serenegiant.usb.UVCCamera.FRAME_FORMAT_MJPEG;
 
 /**
  * Created by YangJianHui on 2022/9/27.
  */
-public class HoppenCamera implements LifecycleEventObserver {
+public class HoppenCamera{
    private UsbMonitor usbMonitor;
-   private Builder builder;
 
    private HoppenCamera(){
-      usbMonitor = new UsbMonitor();
    }
 
-   @Override
-   public void onStateChanged(@NonNull LifecycleOwner source, @NonNull Lifecycle.Event event) {
-      if (event.equals(Lifecycle.Event.ON_CREATE)){
-         usbMonitor.requestDeviceList(builder.context);
-      }else if (event.equals(Lifecycle.Event.ON_START)){
-         usbMonitor.register(builder.context);
-      }else if (event.equals(Lifecycle.Event.ON_STOP)){
-         usbMonitor.unregister(builder.context);
-      }else if (event.equals(Lifecycle.Event.ON_DESTROY)){
-//         taskQueue.cancel();
-//         controller.close();
-      }else if (event.equals(Lifecycle.Event.ON_RESUME)){
-         //new Handler().postDelayed(() -> controller.getCameraDevice().startPreview(),500);
-      }
-   }
-
-   private HoppenController2 createController(Builder builder){
-      this.builder = builder;
-      Context context = builder.context;
+   private HoppenController createController(CameraConfig cameraConfig){
+      WeakReference<Context> contextWeakReference= new WeakReference<>(cameraConfig.textureView.getContext());
+      Context context = contextWeakReference.get();
+      if (context==null)return null;
       if (!(context instanceof LifecycleOwner)) return null;
-      ((LifecycleOwner)context).getLifecycle().addObserver(this);
-       HoppenController2 hoppenController2 = new HoppenController2();
-       usbMonitor.setOnUsbStatusListener(hoppenController2);
+      HoppenController hoppenController2 = new HoppenController(cameraConfig);
+      cameraConfig.textureView.setSurfaceTextureListener(new TextureView.SurfaceTextureListener() {
+          @Override
+          public void onSurfaceTextureAvailable(SurfaceTexture surface, int width, int height) {
+              LogUtils.e(surface.toString());
+              if (cameraConfig.surfaceTexture==null){
+                  cameraConfig.surfaceTexture = surface;
+              }else {
+                  if (cameraConfig.getNotifyListener()!=null){
+                      LogUtils.e(cameraConfig.surfaceTexture.toString(),surface.toString());
+                      cameraConfig.surfaceTexture = surface;
+                      cameraConfig.getNotifyListener().onUpdateSurface(surface);
+                  }
+              }
+              if (usbMonitor==null) {
+                  usbMonitor = new UsbMonitor(hoppenController2);
+                  ((LifecycleOwner)context).getLifecycle().addObserver(new LifecycleEventObserver() {
+                      @Override
+                      public void onStateChanged(@NonNull LifecycleOwner source, @NonNull Lifecycle.Event event) {
+                          if (usbMonitor==null)return;
+                          if (event.equals(Lifecycle.Event.ON_CREATE)){
+                              usbMonitor.connectListDevice(contextWeakReference.get());
+                          }else if (event.equals(Lifecycle.Event.ON_START)){
+                              usbMonitor.register(contextWeakReference.get());
+                          }else if (event.equals(Lifecycle.Event.ON_STOP)){
+                              usbMonitor.unregister(contextWeakReference.get());
+                              if (cameraConfig!=null&&cameraConfig.getNotifyListener()!=null){
+                                  cameraConfig.getNotifyListener().onPageStop();
+                              }
+                          }else if (event.equals(Lifecycle.Event.ON_DESTROY)){
+                              if (cameraConfig!=null&&cameraConfig.getNotifyListener()!=null){
+                                  cameraConfig.getNotifyListener().onPageDestroy();
+                              }
+                          }
+                      }
+                  });
+              }
+          }
+
+          @Override
+          public void onSurfaceTextureSizeChanged(SurfaceTexture surface, int width, int height) {
+          }
+          @Override
+          public boolean onSurfaceTextureDestroyed(SurfaceTexture surface) {
+              return false;
+          }
+          @Override
+          public void onSurfaceTextureUpdated(SurfaceTexture surface) {
+          }
+      });
       return hoppenController2;
    }
 
-
    public static class Builder{
-      private Context context;//仅用来监听activity情况 禁止其他地方引用
-      private int resolutionWidth = 640;
-      private int resolutionHeight = 480;
-      private String specifyDeviceName;
-//      private UVCCameraTextureView textureView;
-      private OnDeviceListener onDeviceListener;
-      private int frameFormat = FRAME_FORMAT_MJPEG;
-      private OnWaterListener onWaterListener;
-      private OnInfoListener onInfoListener;
-      private OnCaptureListener onCaptureListener;
+      private CameraConfig cameraConfig;
 
-      public Builder(Context context){
-         this.context = context;
+      public Builder(UVCCameraTextureView textureView){
+          cameraConfig = new CameraConfig();
+          cameraConfig.textureView = textureView;
+      }
+
+      public Builder setCameraButtonListener(IButtonCallback cameraButtonListener){
+          cameraConfig.cameraButtonListener = cameraButtonListener;
+          return this;
       }
 
       public Builder setResolution(int width ,int height) {
-         this.resolutionWidth = width;
-         this.resolutionHeight = height;
+         cameraConfig.resolutionWidth = width;
+         cameraConfig.resolutionHeight = height;
          return this;
       }
-
-      public Builder setSpecifyDeviceName(String specifyDeviceName) {
-         this.specifyDeviceName = specifyDeviceName;
-         return this;
-      }
-
-//      public Builder setTextureView(UVCCameraTextureView textureView) {
-//         this.textureView = textureView;
-//         return this;
-//      }
 
       public Builder setOnDeviceListener(OnDeviceListener onDeviceListener) {
-         this.onDeviceListener = onDeviceListener;
+         cameraConfig.onDeviceListener = onDeviceListener;
          return this;
       }
 
       public Builder setFrameFormat(int frameFormat) {
-         this.frameFormat = frameFormat;
+         cameraConfig.frameFormat = frameFormat;
          return this;
       }
 
-      public Builder setOnWaterListener(OnWaterListener onWaterListener) {
-         this.onWaterListener = onWaterListener;
+      public Builder setOnMoistureListener(OnMoistureListener onMoistureListener) {
+         cameraConfig.onMoistureListener = onMoistureListener;
          return this;
       }
 
       public Builder setOnInfoListener(OnInfoListener onInfoListener) {
-         this.onInfoListener = onInfoListener;
+         cameraConfig.onInfoListener = onInfoListener;
          return this;
       }
 
-      public Builder setOnCaptureListener(OnCaptureListener onCaptureListener) {
-         this.onCaptureListener = onCaptureListener;
-         return this;
+      public HoppenController build(){
+         return new HoppenCamera().createController(cameraConfig);
       }
 
-      public HoppenController2 build(){
-         return new HoppenCamera().createController(this);
-      }
+   }
+
+   public static class CameraConfig{
+       private SurfaceTexture surfaceTexture;
+       private UVCCameraTextureView textureView;
+       private int resolutionWidth;
+       private int resolutionHeight;
+       private OnDeviceListener onDeviceListener;
+       private int frameFormat = FRAME_FORMAT_MJPEG;
+       private OnMoistureListener onMoistureListener;
+       private OnInfoListener onInfoListener;
+       private IButtonCallback cameraButtonListener;
+       private String devicePathName = "";
+       private NotifyListener notifyListener;
 
 
+       public int getResolutionWidth() {
+           return resolutionWidth;
+       }
+
+       public int getResolutionHeight() {
+           return resolutionHeight;
+       }
+
+       public OnDeviceListener getOnDeviceListener() {
+           return onDeviceListener;
+       }
+
+       public int getFrameFormat() {
+           return frameFormat;
+       }
+
+       public OnMoistureListener getOnMoistureListener() {
+           return onMoistureListener;
+       }
+
+       public OnInfoListener getOnInfoListener() {
+           return onInfoListener;
+       }
+
+       public UVCCameraTextureView getTextureView() {
+           return textureView;
+       }
+
+       public IButtonCallback getCameraButtonListener() {
+           return cameraButtonListener;
+       }
+
+       public SurfaceTexture getSurfaceTexture() {
+           return surfaceTexture;
+       }
+
+       public String getDevicePathName() {
+           return devicePathName;
+       }
+
+       public void setDevicePathName(String devicePathName) {
+           this.devicePathName = devicePathName;
+       }
+
+       public NotifyListener getNotifyListener() {
+           return notifyListener;
+       }
+
+       public void setNotifyListener(NotifyListener notifyListener) {
+           this.notifyListener = notifyListener;
+       }
    }
 
 }

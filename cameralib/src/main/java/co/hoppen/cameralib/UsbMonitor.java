@@ -62,12 +62,14 @@ public class UsbMonitor{
     }
 
     public void register(Context context){
-        initUsbReceiver();
-        IntentFilter filter = new IntentFilter();
-        filter.addAction(UsbManager.ACTION_USB_DEVICE_ATTACHED);
-        filter.addAction(UsbManager.ACTION_USB_DEVICE_DETACHED);
-        filter.addAction(USB_PERMISSION);
-        context.registerReceiver(usbReceiver,filter);
+        if (context!=null){
+            initUsbReceiver();
+            IntentFilter filter = new IntentFilter();
+            filter.addAction(UsbManager.ACTION_USB_DEVICE_ATTACHED);
+            filter.addAction(UsbManager.ACTION_USB_DEVICE_DETACHED);
+            filter.addAction(USB_PERMISSION);
+            context.registerReceiver(usbReceiver,filter);
+        }
     }
 
     private void initUsbReceiver() {
@@ -116,9 +118,11 @@ public class UsbMonitor{
     }
 
     public void unregister(Context context){
-        if (usbReceiver!=null){
-            context.unregisterReceiver(usbReceiver);
-            usbReceiver = null;
+        if (context!=null){
+            if (usbReceiver!=null){
+                context.unregisterReceiver(usbReceiver);
+                usbReceiver = null;
+            }
         }
     }
 
@@ -141,26 +145,27 @@ public class UsbMonitor{
         }else return false;
     }
 
-    public List<UsbDevice> requestDeviceList(Context context){
-        ArrayList<UsbDevice> usbDevices = new ArrayList<>(usbManager.getDeviceList().values());
-
-        Iterator<UsbDevice> iterator = usbDevices.iterator();
-        while (iterator.hasNext()){
-            UsbDevice next = iterator.next();
-            LogUtils.e("request devices pid:"+next.getProductId()+"  vid:"+next.getVendorId(),next.toString());
-            DeviceFilter hoppenDevice = deviceFilter(next);
-            if (hoppenDevice!=null){
-                LogUtils.e(next.toString());
-                if (hasPermission(next)){
-                    onUsbStatusListener.onConnecting(next,hoppenDevice.type);
-                }else {
-                    doubleCheckMap.put(next.getDeviceName(),next);
-                    requestPermission(context,next);
+    public void connectListDevice(Context context){
+        if (context!=null){
+            ArrayList<UsbDevice> usbDevices = new ArrayList<>(usbManager.getDeviceList().values());
+            Iterator<UsbDevice> iterator = usbDevices.iterator();
+            while (iterator.hasNext()){
+                UsbDevice next = iterator.next();
+                LogUtils.e("request devices pid:"+next.getProductId()+"  vid:"+next.getVendorId(),next.toString());
+                DeviceFilter hoppenDevice = deviceFilter(next);
+                if (hoppenDevice!=null){
+                    LogUtils.e(next.toString());
+                    if (hasPermission(next)){
+                        onUsbStatusListener.onConnecting(next,hoppenDevice.type);
+                    }else {
+                        doubleCheckMap.put(next.getDeviceName(),next);
+                        requestPermission(context,next);
+                    }
                 }
             }
         }
-        return usbDevices;
     }
+
 
     private DeviceFilter deviceFilter(UsbDevice usbDevice){
         if (filterList==null) return null;

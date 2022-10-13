@@ -20,10 +20,8 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 
-import co.hoppen.cameralib.ErrorCode;
-import co.hoppen.cameralib.HoppenCameraHelper;
+import co.hoppen.cameralib.HoppenCamera;
 import co.hoppen.cameralib.HoppenController;
-import co.hoppen.cameralib.Instruction;
 import co.hoppen.cameralib.CallBack.OnDeviceListener;
 import co.hoppen.cameralib.widget.UVCCameraTextureView;
 
@@ -31,16 +29,21 @@ import co.hoppen.cameralib.widget.UVCCameraTextureView;
  * Created by YangJianHui on 2022/2/24.
  */
 public class FaceActivity extends BaseActivity implements OnDeviceListener, View.OnLongClickListener {
-   private HoppenController hoppenController;
    private ImageView faceView;
    private UVCCameraTextureView textureView;
-
+   private HoppenController hoppenController;
 
    @Override
    protected void onCreate(@Nullable Bundle savedInstanceState) {
       super.onCreate(savedInstanceState);
       setContentView(R.layout.activity_face);
       initView();
+   }
+
+   @Override
+   protected void onResume() {
+      super.onResume();
+      hoppenController.startPreview();
    }
 
    private void initView() {
@@ -53,53 +56,46 @@ public class FaceActivity extends BaseActivity implements OnDeviceListener, View
 //      int h_screen = dm.heightPixels;
 //      matrix.postScale(-1, 1, w_screen/2, h_screen / 2);//镜像水平翻转
 //      textureView.setTransform(matrix);
-      hoppenController = HoppenCameraHelper.createController(this,textureView,this);
-
+      hoppenController = new HoppenCamera.Builder(textureView).build();
       faceView.setOnLongClickListener(this);
+   }
+
+   @Override
+   public void onConnected(String productName) {
 
    }
 
    @Override
-   public void onConnected() {
+   public void onDisconnect() {
 
-   }
-
-   @Override
-   public void onDisconnect(ErrorCode errorCode) {
-
-   }
-
-   @Override
-   protected void onStop() {
-      super.onStop();
-      if (hoppenController!=null)hoppenController.close();
    }
 
    public void rgb(View view){
-      if (hoppenController!=null)hoppenController.sendInstructions(Instruction.LIGHT_RGB);
+      hoppenController.rgbLight();
    }
 
    public void uv(View view){
-      if (hoppenController!=null)hoppenController.sendInstructions(Instruction.LIGHT_UV);
+      hoppenController.uvLight();
    }
 
    public void polarized(View view){
-      if (hoppenController!=null)hoppenController.sendInstructions(Instruction.LIGHT_POLARIZED);
+      hoppenController.polarizedLight();
    }
 
    public void balanced(View view){
-      if (hoppenController!=null)hoppenController.sendInstructions(Instruction.LIGHT_BALANCED_POLARIZED);
+      hoppenController.balancedPolarizedLight();
    }
 
    public void wood(View view){
-      if (hoppenController!=null)hoppenController.sendInstructions(Instruction.LIGHT_WOOD);
+      hoppenController.woodLight();
    }
 
    public void close(View view){
-      if (hoppenController!=null)hoppenController.sendInstructions(Instruction.LIGHT_CLOSE);
+      hoppenController.closeLight();
    }
 
    public void t(View view){
+      //hoppenController.closeDevices();
       startActivity(new Intent(this,NullActivity.class));
       finish();
    }

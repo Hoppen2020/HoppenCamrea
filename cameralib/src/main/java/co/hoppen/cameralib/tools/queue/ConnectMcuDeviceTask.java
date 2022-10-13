@@ -1,5 +1,6 @@
 package co.hoppen.cameralib.tools.queue;
 
+import android.content.Context;
 import android.hardware.usb.UsbConstants;
 import android.hardware.usb.UsbDevice;
 import android.hardware.usb.UsbDeviceConnection;
@@ -8,6 +9,7 @@ import android.hardware.usb.UsbInterface;
 import android.hardware.usb.UsbManager;
 
 import com.blankj.utilcode.util.LogUtils;
+import com.blankj.utilcode.util.Utils;
 
 import java.util.Arrays;
 
@@ -24,8 +26,8 @@ import static co.hoppen.cameralib.CompatibleMode.MODE_SINGLE;
 public class ConnectMcuDeviceTask extends Task{
    private ConnectMcuInfo connectMcuInfo;
 
-   public ConnectMcuDeviceTask(UsbManager usbManager,UsbDevice usbDevice){
-      connectMcuInfo = new ConnectMcuInfo(usbManager,usbDevice);
+   public ConnectMcuDeviceTask(UsbDevice usbDevice){
+      connectMcuInfo = new ConnectMcuInfo(usbDevice);
    }
 
    public ConnectMcuInfo getConnectMcuInfo() {
@@ -35,7 +37,7 @@ public class ConnectMcuDeviceTask extends Task{
    @Override
    public void taskContent() {
       if (connectMcuInfo!=null){
-         UsbManager usbManager = connectMcuInfo.usbManager;
+         UsbManager usbManager = (UsbManager) Utils.getApp().getSystemService(Context.USB_SERVICE);
          UsbDevice usbDevice = connectMcuInfo.usbDevice;
          UsbDeviceConnection usbDeviceConnection = usbManager.openDevice(usbDevice);
          int interfaceCount = usbDevice.getInterfaceCount();
@@ -131,7 +133,6 @@ public class ConnectMcuDeviceTask extends Task{
    private byte[] readData(ConnectMcuInfo connectMcuInfo){
       final byte[] data = new byte[128];
       int cnt = connectMcuInfo.usbDeviceConnection.bulkTransfer(connectMcuInfo.epIn, data, data.length, 300);
-//      LogUtils.e(cnt);
       if (cnt!=-1){
          byte[] bytes = Arrays.copyOfRange(data, 0, cnt);
          return bytes;
@@ -300,16 +301,14 @@ public class ConnectMcuDeviceTask extends Task{
 
 
    public class ConnectMcuInfo{
-      public UsbDevice usbDevice;
-      private UsbManager usbManager;
       private UsbInterface usbInterface = null;
       private UsbEndpoint epOut = null,epIn = null;
       private UsbDeviceConnection usbDeviceConnection = null;
       private boolean conform = false;
       private co.hoppen.cameralib.CompatibleMode compatibleMode;
+      private UsbDevice usbDevice;
 
-      public ConnectMcuInfo(UsbManager usbManager,UsbDevice usbDevice){
-         this.usbManager = usbManager;
+      public ConnectMcuInfo(UsbDevice usbDevice){
          this.usbDevice = usbDevice;
       }
 
@@ -336,6 +335,21 @@ public class ConnectMcuDeviceTask extends Task{
       public co.hoppen.cameralib.CompatibleMode getCompatibleMode() {
          return compatibleMode;
       }
+
+      public String getDeviceName(){
+         if (usbDevice!=null){
+            return usbDevice.getDeviceName();
+         }else return "";
+      }
+
+      public void setNull(){
+         usbDeviceConnection = null;
+         usbInterface = null;
+         epOut = null;
+         epIn = null;
+         usbDevice = null;
+      }
+
    }
 
 

@@ -184,6 +184,10 @@ public class UVCCamera {
         //miConnStatus = 0;
     }
 
+    public void setCurrentFrameFormat(int currentFrameFormat) {
+        this.mCurrentFrameFormat = currentFrameFormat;
+    }
+
     /**
      * connect to a UVC camera
      * USB permission is necessary before this method is called
@@ -409,9 +413,7 @@ public class UVCCamera {
     public synchronized void stopPreview() {
         setFrameCallback(null, 0);
         if (mControlBlock != null) {
-//            if (miConnStatus == 1) { // add if by liml
                 nativeStopPreview(mNativePtr);
-//            }
         }
     }
 

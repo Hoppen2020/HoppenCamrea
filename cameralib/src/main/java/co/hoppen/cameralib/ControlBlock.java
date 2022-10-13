@@ -1,9 +1,13 @@
 package co.hoppen.cameralib;
 
+import android.content.Context;
 import android.hardware.usb.UsbDevice;
 import android.hardware.usb.UsbDeviceConnection;
 import android.hardware.usb.UsbManager;
 import android.text.TextUtils;
+
+import com.blankj.utilcode.util.AppUtils;
+import com.blankj.utilcode.util.Utils;
 
 /**
  * 描述：usb控制信息类
@@ -13,18 +17,17 @@ import android.text.TextUtils;
  */
 public class ControlBlock {
     private static final String DEFAULT_USBFS = "/dev/bus/usb";
-    private UsbManager mUsbManager;
     private UsbDevice mUsbDevice;
     private UsbDeviceConnection mUsbConnection;
 
-    public ControlBlock(UsbManager usbManager, UsbDevice usbDevice) {
-        this.mUsbManager = usbManager;
+    public ControlBlock(UsbDevice usbDevice) {
         this.mUsbDevice = usbDevice;
     }
 
     public UsbDeviceConnection open() {
-        if (mUsbManager != null && mUsbDevice != null) {
-            mUsbConnection = mUsbManager.openDevice(mUsbDevice);
+        if (mUsbDevice != null) {
+            UsbManager usbManager = (UsbManager) Utils.getApp().getSystemService(Context.USB_SERVICE);
+            mUsbConnection = usbManager.openDevice(mUsbDevice);
         }
         return mUsbConnection;
     }
