@@ -31,7 +31,6 @@ import android.view.SurfaceHolder;
 
 import com.blankj.utilcode.util.LogUtils;
 import com.jiangdg.utils.Size;
-import com.jiangdg.utils.XLogWrapper;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -958,16 +957,16 @@ public class UVCCamera {
     	    	if (false) {
 					dumpControls(mControlSupports);
 					dumpProc(mProcSupports);
-					XLogWrapper.v(TAG, String.format("Brightness:min=%d,max=%d,def=%d", mBrightnessMin, mBrightnessMax, mBrightnessDef));
-					XLogWrapper.v(TAG, String.format("Contrast:min=%d,max=%d,def=%d", mContrastMin, mContrastMax, mContrastDef));
-					XLogWrapper.v(TAG, String.format("Sharpness:min=%d,max=%d,def=%d", mSharpnessMin, mSharpnessMax, mSharpnessDef));
-					XLogWrapper.v(TAG, String.format("Gain:min=%d,max=%d,def=%d", mGainMin, mGainMax, mGainDef));
-					XLogWrapper.v(TAG, String.format("Gamma:min=%d,max=%d,def=%d", mGammaMin, mGammaMax, mGammaDef));
-					XLogWrapper.v(TAG, String.format("Saturation:min=%d,max=%d,def=%d", mSaturationMin, mSaturationMax, mSaturationDef));
-					XLogWrapper.v(TAG, String.format("Hue:min=%d,max=%d,def=%d", mHueMin, mHueMax, mHueDef));
-					XLogWrapper.v(TAG, String.format("Zoom:min=%d,max=%d,def=%d", mZoomMin, mZoomMax, mZoomDef));
-					XLogWrapper.v(TAG, String.format("WhiteBlance:min=%d,max=%d,def=%d", mWhiteBlanceMin, mWhiteBlanceMax, mWhiteBlanceDef));
-					XLogWrapper.v(TAG, String.format("Focus:min=%d,max=%d,def=%d", mFocusMin, mFocusMax, mFocusDef));
+//					XLogWrapper.v(TAG, String.format("Brightness:min=%d,max=%d,def=%d", mBrightnessMin, mBrightnessMax, mBrightnessDef));
+//					XLogWrapper.v(TAG, String.format("Contrast:min=%d,max=%d,def=%d", mContrastMin, mContrastMax, mContrastDef));
+//					XLogWrapper.v(TAG, String.format("Sharpness:min=%d,max=%d,def=%d", mSharpnessMin, mSharpnessMax, mSharpnessDef));
+//					XLogWrapper.v(TAG, String.format("Gain:min=%d,max=%d,def=%d", mGainMin, mGainMax, mGainDef));
+//					XLogWrapper.v(TAG, String.format("Gamma:min=%d,max=%d,def=%d", mGammaMin, mGammaMax, mGammaDef));
+//					XLogWrapper.v(TAG, String.format("Saturation:min=%d,max=%d,def=%d", mSaturationMin, mSaturationMax, mSaturationDef));
+//					XLogWrapper.v(TAG, String.format("Hue:min=%d,max=%d,def=%d", mHueMin, mHueMax, mHueDef));
+//					XLogWrapper.v(TAG, String.format("Zoom:min=%d,max=%d,def=%d", mZoomMin, mZoomMax, mZoomDef));
+//					XLogWrapper.v(TAG, String.format("WhiteBlance:min=%d,max=%d,def=%d", mWhiteBlanceMin, mWhiteBlanceMax, mWhiteBlanceDef));
+//					XLogWrapper.v(TAG, String.format("Focus:min=%d,max=%d,def=%d", mFocusMin, mFocusMax, mFocusDef));
 				}
 			}
     	} else {
@@ -1030,17 +1029,17 @@ public class UVCCamera {
 	};
 
     private static final void dumpControls(final long controlSupports) {
-    	XLogWrapper.i(TAG, String.format("controlSupports=%x", controlSupports));
-    	for (int i = 0; i < SUPPORTS_CTRL.length; i++) {
-    		XLogWrapper.i(TAG, SUPPORTS_CTRL[i] + ((controlSupports & (0x1 << i)) != 0 ? "=enabled" : "=disabled"));
-    	}
+//    	XLogWrapper.i(TAG, String.format("controlSupports=%x", controlSupports));
+//    	for (int i = 0; i < SUPPORTS_CTRL.length; i++) {
+//    		XLogWrapper.i(TAG, SUPPORTS_CTRL[i] + ((controlSupports & (0x1 << i)) != 0 ? "=enabled" : "=disabled"));
+//    	}
     }
 
 	private static final void dumpProc(final long procSupports) {
-    	XLogWrapper.i(TAG, String.format("procSupports=%x", procSupports));
-    	for (int i = 0; i < SUPPORTS_PROC.length; i++) {
-    		XLogWrapper.i(TAG, SUPPORTS_PROC[i] + ((procSupports & (0x1 << i)) != 0 ? "=enabled" : "=disabled"));
-    	}
+//    	XLogWrapper.i(TAG, String.format("procSupports=%x", procSupports));
+//    	for (int i = 0; i < SUPPORTS_PROC.length; i++) {
+//    		XLogWrapper.i(TAG, SUPPORTS_PROC[i] + ((procSupports & (0x1 << i)) != 0 ? "=enabled" : "=disabled"));
+//    	}
     }
 
 	public void setCurrentFrameFormat(int currentFrameFormat) {

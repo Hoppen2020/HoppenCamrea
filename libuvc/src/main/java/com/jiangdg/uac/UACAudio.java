@@ -17,7 +17,6 @@ package com.jiangdg.uac;
 
 import android.text.TextUtils;
 //import com.jiangdg.usb.USBMonitor;
-import com.jiangdg.utils.XLogWrapper;
 
 /** usb audio engine
  *
@@ -53,35 +52,35 @@ public class UACAudio {
 
     public void startRecording() {
         if (mStatus != AudioStatus.CREATED) {
-            XLogWrapper.e(TAG, "startRecording failed: init status error");
+            //XLogWrapper.e(TAG, "startRecording failed: init status error");
             return;
         }
         if (nativeStartRecord(mNativePtr) < 0) {
-            XLogWrapper.e(TAG, "startRecording: start failed");
+            //XLogWrapper.e(TAG, "startRecording: start failed");
             mStatus = AudioStatus.ERROR;
             return;
         }
         mStatus = AudioStatus.RUNNING;
-        XLogWrapper.i(TAG, "startRecording: success");
+        //XLogWrapper.i(TAG, "startRecording: success");
     }
 
     public void stopRecording() {
         if (mStatus != AudioStatus.RUNNING) {
-            XLogWrapper.e(TAG, "stopRecording: not in running");
+            //XLogWrapper.e(TAG, "stopRecording: not in running");
             return;
         }
         if (nativeStopRecord(mNativePtr) < 0) {
-            XLogWrapper.e(TAG, "stopRecording: stop failed.");
+            //XLogWrapper.e(TAG, "stopRecording: stop failed.");
             return;
         }
         mStatus = AudioStatus.STOPPED;
-        XLogWrapper.i(TAG, "stopRecording: success");
+        //XLogWrapper.i(TAG, "stopRecording: success");
     }
 
     public void release() {
         nativeRelease(mNativePtr);
         mStatus = AudioStatus.RELEASED;
-        XLogWrapper.i(TAG, "release: success");
+        //XLogWrapper.i(TAG, "release: success");
     }
 
     public int getSampleRate() {
