@@ -97,6 +97,7 @@ public class NewDeviceActivity extends AppCompatActivity implements OnMoistureLi
 
    @Override
    public void onConnected(String productName) {
+      ((TextView)findViewById(R.id.tv_status)).setText("已连接");
       findViewById(R.id.fl_loading).setVisibility(View.GONE);
       ((TextView)findViewById(R.id.tv_device)).setText(productName+"");
    }
@@ -109,6 +110,7 @@ public class NewDeviceActivity extends AppCompatActivity implements OnMoistureLi
 
    @Override
    public void onInfoCallback(Instruction instruction, String info) {
+      Log.e("onInfoCallback",""+info);
       ((TextView)findViewById(R.id.tv_id)).setText(info);
    }
 

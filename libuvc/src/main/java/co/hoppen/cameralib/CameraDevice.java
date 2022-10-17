@@ -42,33 +42,6 @@ public class CameraDevice extends Device{
         return deviceConfig;
     }
 
-
-    public void getUniqueCode(){
-        ThreadUtils.executeByFixed(5, new ThreadUtils.SimpleTask<byte[]>() {
-            @Override
-            public byte[] doInBackground() throws Throwable {
-                byte[] pbuf1 = new byte[4];
-                uvcCamera.jXuRead(0x02c2, 0xFE00, 4, pbuf1);
-                if (pbuf1[0] == 0xff && pbuf1[1] == 0xff && pbuf1[2] == 0xff && pbuf1[3] == 0xff) {
-                    return new byte[0];
-                }else {
-                    int len = (pbuf1[0] << 24) + (pbuf1[1] << 16) + (pbuf1[2] << 8) + pbuf1[3] - 4;
-                    LogUtils.e(len);
-                    //16973831
-                    byte[] pbuf2 = new byte[len];
-                    return pbuf2;
-                }
-            }
-
-            @Override
-            public void onSuccess(byte[] result) {
-                uvcCamera.jXuRead(0x02c2, 0xFE00 + 4, result.length, result);
-                String info = new String(result, 0, 12);
-                LogUtils.e(info);
-            }
-        });
-    }
-
     @Override
     void sendInstruction(Instruction instruction) {
         //异步发送指令
@@ -105,20 +78,19 @@ public class CameraDevice extends Device{
                                         }
                                     }
                                 }else if (instruction==UNIQUE_CODE){
-//                                    byte[] pbuf1 = new byte[4];
-//                                    uvcCamera.jXuRead(0x02c2, 0xFE00, 4, pbuf1);
-//                                    if (pbuf1[0] == 0xff && pbuf1[1] == 0xff && pbuf1[2] == 0xff && pbuf1[3] == 0xff) {
-//                                        //nothing work
-//                                    } else {
-//                                        int len = (pbuf1[0] << 24) + (pbuf1[1] << 16) + (pbuf1[2] << 8) + pbuf1[3] - 4;
-//                                        //LogUtils.e(len);
-//                                        byte[] pbuf2 = new byte[len];
-//                                        //LogUtils.e(len);
-//                                        uvcCamera.jXuRead(0x02c2, 0xFE00 + 4, len, pbuf2);
-//                                        String info = new String(pbuf2, 0, 12);
-//                                        resultMap.put(instruction,info);
-//                                    }
-                                    resultMap.put(instruction,"");
+                                    byte[] pbuf = new byte[4];
+                                    uvcCamera.jXuRead(0x02c2, 0xFE00, pbuf.length, pbuf);
+                                    if (pbuf[0] == 0xff && pbuf[1] == 0xff && pbuf[2] == 0xff && pbuf[3] == 0xff) {
+                                        //nothing work
+                                        resultMap.put(instruction,"");
+                                    } else {
+                                        int len = (pbuf[0] << 24) + (pbuf[1] << 16) + (pbuf[2] << 8) + pbuf[3] - 4;
+                                        LogUtils.e(len);
+                                        pbuf = new byte[len];
+                                        uvcCamera.jXuRead(0x02c2, 0xFE00 + 4, pbuf.length, pbuf);
+                                        String info = new String(pbuf, 0, 12);
+                                        resultMap.put(instruction,info);
+                                    }
                                 }else {
                                     switch (instruction) {
                                         case LIGHT_CLOSE:
@@ -200,7 +172,7 @@ public class CameraDevice extends Device{
                             }
                         }else if (result.containsKey(UNIQUE_CODE)){
                             if (cameraConfig.getOnInfoListener()!=null){
-                                //cameraConfig.getOnInfoListener().onInfoCallback(instruction, (String) result.get(UNIQUE_CODE));
+                                cameraConfig.getOnInfoListener().onInfoCallback(instruction, (String) result.get(UNIQUE_CODE));
                             }
                         }
                     }

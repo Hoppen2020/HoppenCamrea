@@ -2308,30 +2308,42 @@ int UVCCamera::getAnalogVideoLockState() {
 // qzm
 int UVCCamera::xuWrite(int cmd, int addr, int len, unsigned char *pbuf)
 {
-    unsigned char pcmd[8];
-    unsigned char pdat[8];
+        unsigned char pcmd[8];
+            unsigned char pdat[8];
 
-    memset(pcmd,0,8);
-    memset(pdat,0,8);
+            libusb_device_handle *devh = mDeviceHandle->usb_devh;
+            if (devh == NULL)
+                return -1;
 
-    libusb_device_handle *devh = mDeviceHandle->usb_devh;
-    if (devh == NULL)
-        return -1;
+            pcmd[0] = (cmd&0xff00)>>8;
+            pcmd[1] = (cmd&0xff);
+            pcmd[2] = (addr&0xff);
+            pcmd[3] = (addr&0xff00)>>8;
+            pcmd[4] = (len&0xff);
+            pcmd[5] = (len&0xff00)>>8;
+            pcmd[6] = (addr&0xff0000)>>16;
+            pcmd[7] = 0x00;
+            libusb_control_transfer(devh, 0x21, 0x01, 0x0a00, 0x0400, pcmd, 8, 0);
 
-    pcmd[0] = 0x00;
-    pcmd[1] = (cmd&0xff);
-    pcmd[2] = (addr&0xff);
-    pcmd[3] = (addr&0xff00)>>8;
-    pcmd[4] = (len&0xff);
-    pcmd[5] = (len&0xff00)>>8;
-    pcmd[6] = (addr&0xff0000)>>16;
-    pcmd[7] = 0x00;
-    libusb_control_transfer(devh, 0x21, 0x01, 0x0a00, 0x0400, pcmd, 8, 0);
+            int num = len/8;
+            int offset = len%8;
+            if (offset>0)
+                num++;
 
-    memcpy(pdat, pbuf, len);
-    libusb_control_transfer(devh, 0x21, 0x01, 0x0b00, 0x0400, pdat, 8, 0);
+            for (int i=0; i<num; i++) {
+                if (offset>0 && i==num-1) {
+                    memset(pdat, 0, 8);
+                    memcpy(pdat, pbuf+i*8, offset);
+                } else {
+                    memcpy(pdat, pbuf+i*8, 8);
+                }
 
-    return 0;
+                libusb_control_transfer(devh, 0x21, 0x01, 0x0b00, 0x0400, pdat, 8, 0);
+
+                usleep(1000);
+            }
+
+            return 0;
 }
 
 int UVCCamera::xuRead(int cmd, int addr, int len, unsigned char *pbuf)
@@ -2339,14 +2351,11 @@ int UVCCamera::xuRead(int cmd, int addr, int len, unsigned char *pbuf)
     unsigned char pcmd[8];
     unsigned char pdat[8];
 
-    memset(pcmd,0,8);
-    memset(pdat,0,8);
-
     libusb_device_handle *devh = mDeviceHandle->usb_devh;
     if (devh == NULL)
         return -1;
 
-    pcmd[0] = 0x00;
+    pcmd[0] = (cmd&0xff00)>>8;
     pcmd[1] = (cmd&0xff);
     pcmd[2] = (addr&0xff);
     pcmd[3] = (addr&0xff00)>>8;
@@ -2356,9 +2365,22 @@ int UVCCamera::xuRead(int cmd, int addr, int len, unsigned char *pbuf)
     pcmd[7] = 0x00;
     libusb_control_transfer(devh, 0x21, 0x01, 0x0a00, 0x0400, pcmd, 8, 0);
 
-    libusb_control_transfer(devh, 0xa1, 0x81, 0x0b00, 0x0400, pdat, 8, 0);
+    int num = len/8;
+    int offset = len%8;
+    if (offset>0)
+        num++;
 
-    memcpy(pbuf, pdat, len);
+    for (int i=0; i<num; i++) {
+        memset(pdat, 0, 8);
+        libusb_control_transfer(devh, 0xa1, 0x81, 0x0b00, 0x0400, pdat, 8, 0);
 
+        if (offset>0 && i==num-1) {
+            memcpy(pbuf+i*8, pdat, offset);
+        } else {
+            memcpy(pbuf+i*8, pdat, 8);
+        }
+
+        usleep(1000);
+    }
     return 0;
 }
