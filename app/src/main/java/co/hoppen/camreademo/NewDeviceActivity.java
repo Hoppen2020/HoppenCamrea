@@ -14,6 +14,7 @@ import androidx.appcompat.app.AppCompatActivity;
 import com.jiangdg.uvc.IButtonCallback;
 import com.jiangdg.uvc.UVCCamera;
 
+import co.hoppen.cameralib.CallBack.CaptureCallback;
 import co.hoppen.cameralib.CallBack.OnDeviceListener;
 import co.hoppen.cameralib.CallBack.OnInfoListener;
 import co.hoppen.cameralib.CallBack.OnMoistureListener;
@@ -84,7 +85,17 @@ public class NewDeviceActivity extends AppCompatActivity implements OnMoistureLi
    public void onButton(int button, int state) {
       Log.e("onButton",button+ "  "+state);
       if (state==1){
-         controller.capturePicture(new HoppenController.CaptureResult() {
+         //1
+//         controller.capturePicture(new CaptureCallback() {
+//            @Override
+//            public void onCapture(Bitmap bitmap) {
+//               ImageView captureView = findViewById(R.id.iv_capture);
+//               captureView.setVisibility(View.VISIBLE);
+//               captureView.setImageBitmap(bitmap);
+//            }
+//         });
+         //2
+         controller.captureViewPicture(new CaptureCallback() {
             @Override
             public void onCapture(Bitmap bitmap) {
                ImageView captureView = findViewById(R.id.iv_capture);
@@ -92,6 +103,7 @@ public class NewDeviceActivity extends AppCompatActivity implements OnMoistureLi
                captureView.setImageBitmap(bitmap);
             }
          });
+
       }
    }
 

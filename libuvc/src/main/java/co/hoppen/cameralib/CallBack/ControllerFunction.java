@@ -34,8 +34,11 @@ public interface ControllerFunction {
 
     void closeDevices();
 
-    void capturePicture(HoppenController.CaptureResult captureResult);
+    void capturePicture(CaptureCallback captureCallback);
 
-    void capturePicture(int width, int height, HoppenController.CaptureResult captureResult);
+    void capturePicture(int width, int height, CaptureCallback captureCallback);
 
+    void captureViewPicture(CaptureCallback captureCallback);
+
+    void captureViewPicture(int width, int height, CaptureCallback captureCallback);
 }

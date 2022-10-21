@@ -1,5 +1,6 @@
 package co.hoppen.cameralib;
 
+import android.graphics.Bitmap;
 import android.graphics.SurfaceTexture;
 import android.hardware.usb.UsbDevice;
 import android.os.Build;
@@ -9,10 +10,18 @@ import com.blankj.utilcode.util.LogUtils;
 import com.blankj.utilcode.util.SPUtils;
 import com.blankj.utilcode.util.StringUtils;
 import com.blankj.utilcode.util.ThreadUtils;
+import com.jiangdg.utils.MediaUtils;
+import com.jiangdg.uvc.IFrameCallback;
 import com.jiangdg.uvc.UVCCamera;
 
+import java.nio.ByteBuffer;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.concurrent.LinkedBlockingDeque;
+import java.util.concurrent.TimeUnit;
+
+import co.hoppen.cameralib.CallBack.CaptureCallback;
+import co.hoppen.cameralib.widget.UVCCameraTextureView;
 
 import static co.hoppen.cameralib.Instruction.MOISTURE;
 import static co.hoppen.cameralib.Instruction.UNIQUE_CODE;
@@ -29,6 +38,10 @@ public class CameraDevice extends Device{
     private final String DEVICE_NAME = "Device_Name";
 
     private Surface surface;
+
+    private LinkedBlockingDeque<byte[]> mNV21DataQueue = new LinkedBlockingDeque<>();
+
+    private boolean capturing = false;
 
     public void setCameraConfig(HoppenCamera.CameraConfig cameraConfig) {
         this.cameraConfig = cameraConfig;
@@ -85,7 +98,7 @@ public class CameraDevice extends Device{
                                         resultMap.put(instruction,"");
                                     } else {
                                         int len = (pbuf[0] << 24) + (pbuf[1] << 16) + (pbuf[2] << 8) + pbuf[3] - 4;
-                                        LogUtils.e(len);
+//                                        LogUtils.e(len);
                                         pbuf = new byte[len];
                                         uvcCamera.jXuRead(0x02c2, 0xFE00 + 4, pbuf.length, pbuf);
                                         String info = new String(pbuf, 0, 12);
@@ -259,6 +272,21 @@ public class CameraDevice extends Device{
                 uvcCamera.setButtonCallback(cameraConfig.getCameraButtonListener());
                 uvcCamera.setPreviewDisplay(surface);
                 //****
+                uvcCamera.setFrameCallback(new IFrameCallback() {
+                    @Override
+                    public void onFrame(ByteBuffer frame) {
+                        if (frame!=null){
+                            byte[] data = new byte[frame.capacity()];
+                            frame.get(data);
+                            if (mNV21DataQueue!=null){
+                                if (mNV21DataQueue.size()>=5){
+                                    mNV21DataQueue.removeLast();
+                                }
+                                mNV21DataQueue.offerFirst(data);
+                            }
+                        }
+                    }
+                },UVCCamera.PIXEL_FORMAT_YUV420SP);
                 uvcCamera.updateCameraParams();
                 uvcCamera.startPreview();
             }
@@ -269,6 +297,9 @@ public class CameraDevice extends Device{
     public void stopPreview(){
         try {
             LogUtils.e("stopPreview");
+            if (mNV21DataQueue!=null){
+                mNV21DataQueue.clear();
+            }
             if (uvcCamera!=null && cameraConfig!=null){
                 uvcCamera.setButtonCallback(null);
                 uvcCamera.stopPreview();
@@ -286,15 +317,56 @@ public class CameraDevice extends Device{
             startPreview();
         }
     }
-//
-//    @Override
-//    public void onPageStop() {
-//        stopPreview();
-//    }
-//
-//    @Override
-//    public void onPageDestroy() {
-//        closeDevice();
-//    }
+
+    public void captureImageByViewInternal(int width,int height,CaptureCallback captureCallback){
+        ThreadUtils.executeBySingle(new ThreadUtils.SimpleTask<Bitmap>() {
+            @Override
+            public Bitmap doInBackground() throws Throwable {
+                Bitmap captureBitmap = null;
+
+                if (cameraConfig!=null && cameraConfig.getTextureView()!=null&&captureCallback!=null){
+                    UVCCameraTextureView textureView = cameraConfig.getTextureView();
+                    if (width!=0 && height!=0){
+                        captureBitmap = textureView.getBitmap(width,height);
+                    }else captureBitmap = textureView.getBitmap();
+                }
+                return captureBitmap;
+            }
+
+            @Override
+            public void onSuccess(Bitmap result) {
+                if (captureCallback!=null){
+                    if (result!=null){
+                        captureCallback.onCapture(result);
+                    }
+                }
+            }
+        });
+    }
+
+    public void captureImageInternal(int width , int height,CaptureCallback captureCallback){
+        if (capturing||mNV21DataQueue==null||uvcCamera==null) return;
+        ThreadUtils.executeBySingle(new ThreadUtils.SimpleTask<Bitmap>() {
+            @Override
+            public Bitmap doInBackground() throws Throwable {
+                capturing = true;
+                byte[] data = mNV21DataQueue.pollFirst(1L, TimeUnit.SECONDS);
+                if (data!=null){
+                    int captureWidth = width==0? uvcCamera.getmCurrentWidth():width;
+                    int captureHeight = height==0?uvcCamera.getmCurrentHeight():height;
+                    return MediaUtils.yuv2Peg(data, captureWidth, captureHeight);
+                }
+                return null;
+            }
+
+            @Override
+            public void onSuccess(Bitmap result) {
+                capturing = false;
+                if (captureCallback!=null&&result!=null){
+                    captureCallback.onCapture(result);
+                }
+            }
+        });
+    }
 
 }

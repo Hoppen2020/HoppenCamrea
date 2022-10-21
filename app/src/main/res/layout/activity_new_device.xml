@@ -9,12 +9,14 @@
 
     <FrameLayout
         android:layout_width="800dp"
-        android:layout_height="600dp">
+        android:layout_height="600dp"
+        >
 
         <co.hoppen.cameralib.widget.UVCCameraTextureView
             android:id="@+id/tv_camera"
             android:layout_width="match_parent"
-            android:layout_height="match_parent"/>
+            android:layout_height="match_parent"
+            />
 
         <androidx.appcompat.widget.AppCompatImageView
             android:layout_width="match_parent"

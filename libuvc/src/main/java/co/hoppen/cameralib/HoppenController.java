@@ -7,6 +7,7 @@ import android.hardware.usb.UsbDevice;
 import com.blankj.utilcode.util.LogUtils;
 import com.blankj.utilcode.util.ThreadUtils;
 
+import co.hoppen.cameralib.CallBack.CaptureCallback;
 import co.hoppen.cameralib.CallBack.ControllerFunction;
 import co.hoppen.cameralib.CallBack.NotifyListener;
 import co.hoppen.cameralib.CallBack.OnUsbStatusListener;
@@ -99,7 +100,6 @@ public class HoppenController implements ControllerFunction, OnUsbStatusListener
    @Override
    public void getUniqueCode() {
       send(Instruction.UNIQUE_CODE);
-      //cameraDevice.getUniqueCode();
    }
 
    @Override
@@ -119,32 +119,23 @@ public class HoppenController implements ControllerFunction, OnUsbStatusListener
    }
 
    @Override
-   public void capturePicture(CaptureResult captureResult) {
-      capturePicture(0,0,captureResult);
+   public void capturePicture(CaptureCallback captureCallback) {
+      cameraDevice.captureImageInternal(0,0,captureCallback);
    }
 
    @Override
-   public void capturePicture(int width, int height,CaptureResult captureResult) {
-      ThreadUtils.executeByFixed(5, new ThreadUtils.SimpleTask<Bitmap>() {
-         @Override
-         public Bitmap doInBackground() throws Throwable {
-            Bitmap captureBitmap = null;
-            if (cameraDevice.getCameraConfig()!=null && cameraDevice.getCameraConfig().getTextureView()!=null&&captureResult!=null){
-               UVCCameraTextureView textureView = cameraDevice.getCameraConfig().getTextureView();
-               if (width!=0 && height!=0){
-                  captureBitmap = textureView.getBitmap(width,height);
-               }else captureBitmap = textureView.getBitmap();
-            }
-            return captureBitmap;
-         }
+   public void capturePicture(int width, int height,CaptureCallback captureCallback) {
+      cameraDevice.captureImageInternal(width,height,captureCallback);
+   }
 
-         @Override
-         public void onSuccess(Bitmap result) {
-            if (result!=null){
-               captureResult.onCapture(result);
-            }
-         }
-      });
+   @Override
+   public void captureViewPicture(CaptureCallback captureCallback) {
+      cameraDevice.captureImageByViewInternal(0,0,captureCallback);
+   }
+
+   @Override
+   public void captureViewPicture(int width, int height, CaptureCallback captureCallback) {
+      cameraDevice.captureImageByViewInternal(width,height,captureCallback);
    }
 
    private void send(Instruction instruction){
@@ -166,10 +157,6 @@ public class HoppenController implements ControllerFunction, OnUsbStatusListener
    public void onPageDestroy() {
       LogUtils.e("onPageDestroy");
       closeDevices();
-   }
-
-   public interface CaptureResult {
-      void onCapture(Bitmap bitmap);
    }
 
 }

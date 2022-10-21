@@ -1046,17 +1046,12 @@ public class UVCCamera {
 		this.mCurrentFrameFormat = currentFrameFormat;
 	}
 
-	public void light(){
-		int writeCmd = 0x82;
-		int readCmd = 0xc2;
-		int writeAddr = 0xd55b;
-		int readAddr = 0xd55c;
-		byte[] pdat = new byte[4];
-		pdat[0] = 0x0;    // 0 for write, 1 for read
-		pdat[1] = 0x78;    // slave id (same for read and write)
-		pdat[2] = 0x11;
-		pdat[3] = (byte) 0xff;
-		this.jXuWrite(writeCmd, writeAddr, pdat.length, pdat);
+	public int getmCurrentHeight() {
+		return mCurrentHeight;
+	}
+
+	public int getmCurrentWidth() {
+		return mCurrentWidth;
 	}
 
 	// #nativeCreate and #nativeDestroy are not static methods.
