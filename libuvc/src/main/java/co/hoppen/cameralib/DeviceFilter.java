@@ -31,7 +31,7 @@ import android.text.TextUtils;
 import android.util.Log;
 
 import com.blankj.utilcode.util.Utils;
-import com.jiangdg.uvccamera.R;
+import com.hoppen.uvccamera.R;
 
 import org.xmlpull.v1.XmlPullParser;
 import org.xmlpull.v1.XmlPullParserException;

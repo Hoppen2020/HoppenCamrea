@@ -10,9 +10,9 @@ import com.blankj.utilcode.util.LogUtils;
 import com.blankj.utilcode.util.SPUtils;
 import com.blankj.utilcode.util.StringUtils;
 import com.blankj.utilcode.util.ThreadUtils;
-import com.jiangdg.utils.MediaUtils;
-import com.jiangdg.uvc.IFrameCallback;
-import com.jiangdg.uvc.UVCCamera;
+import com.hoppen.utils.MediaUtils;
+import com.hoppen.uvc.IFrameCallback;
+import com.hoppen.uvc.UVCCamera;
 
 import java.nio.ByteBuffer;
 import java.util.HashMap;

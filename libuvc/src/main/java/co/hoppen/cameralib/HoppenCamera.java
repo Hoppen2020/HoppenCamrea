@@ -10,7 +10,7 @@ import androidx.lifecycle.LifecycleEventObserver;
 import androidx.lifecycle.LifecycleOwner;
 
 import com.blankj.utilcode.util.LogUtils;
-import com.jiangdg.uvc.IButtonCallback;
+import com.hoppen.uvc.IButtonCallback;
 
 import java.lang.ref.WeakReference;
 
@@ -20,7 +20,7 @@ import co.hoppen.cameralib.CallBack.OnInfoListener;
 import co.hoppen.cameralib.CallBack.OnMoistureListener;
 import co.hoppen.cameralib.widget.UVCCameraTextureView;
 
-import static com.jiangdg.uvc.UVCCamera.FRAME_FORMAT_MJPEG;
+import static com.hoppen.uvc.UVCCamera.FRAME_FORMAT_MJPEG;
 
 /**
  * Created by YangJianHui on 2022/9/27.
@@ -36,7 +36,7 @@ public class HoppenCamera{
       Context context = contextWeakReference.get();
       if (context==null)return null;
       if (!(context instanceof LifecycleOwner)) return null;
-      HoppenController hoppenController2 = new HoppenController(cameraConfig);
+      HoppenController controller = new HoppenController(cameraConfig);
       cameraConfig.textureView.setSurfaceTextureListener(new TextureView.SurfaceTextureListener() {
           @Override
           public void onSurfaceTextureAvailable(SurfaceTexture surface, int width, int height) {
@@ -51,7 +51,7 @@ public class HoppenCamera{
                   }
               }
               if (usbMonitor==null) {
-                  usbMonitor = new UsbMonitor(hoppenController2);
+                  usbMonitor = new UsbMonitor(controller);
                   ((LifecycleOwner)context).getLifecycle().addObserver(new LifecycleEventObserver() {
                       @Override
                       public void onStateChanged(@NonNull LifecycleOwner source, @NonNull Lifecycle.Event event) {
@@ -62,11 +62,11 @@ public class HoppenCamera{
                               usbMonitor.register(contextWeakReference.get());
                           }else if (event.equals(Lifecycle.Event.ON_STOP)){
                               usbMonitor.unregister(contextWeakReference.get());
-                              if (cameraConfig!=null&&cameraConfig.getNotifyListener()!=null){
+                              if (cameraConfig.getNotifyListener()!=null){
                                   cameraConfig.getNotifyListener().onPageStop();
                               }
                           }else if (event.equals(Lifecycle.Event.ON_DESTROY)){
-                              if (cameraConfig!=null&&cameraConfig.getNotifyListener()!=null){
+                              if (cameraConfig.getNotifyListener()!=null){
                                   cameraConfig.getNotifyListener().onPageDestroy();
                               }
                           }
@@ -86,11 +86,11 @@ public class HoppenCamera{
           public void onSurfaceTextureUpdated(SurfaceTexture surface) {
           }
       });
-      return hoppenController2;
+      return controller;
    }
 
    public static class Builder{
-      private CameraConfig cameraConfig;
+      private CameraConfig cameraConfig = null;
 
       public Builder(UVCCameraTextureView textureView){
           cameraConfig = new CameraConfig();

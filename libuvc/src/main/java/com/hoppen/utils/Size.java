@@ -21,7 +21,7 @@
  *  may have a different license, see the respective files.
  */
 
-package com.jiangdg.utils;
+package com.hoppen.utils;
 
 import android.os.Parcel;
 import android.os.Parcelable;

@@ -1,4 +1,4 @@
-package com.jiangdg.utils;
+package com.hoppen.utils;
 
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
@@ -9,7 +9,6 @@ import android.graphics.YuvImage;
 import com.blankj.utilcode.util.LogUtils;
 
 import java.io.ByteArrayOutputStream;
-import java.nio.ByteBuffer;
 
 /**
  * Created by YangJianHui on 2022/10/20.

@@ -13,9 +13,8 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.jiangdg.uac;
+package com.hoppen.uac;
 
-import android.text.TextUtils;
 //import com.jiangdg.usb.USBMonitor;
 
 /** usb audio engine

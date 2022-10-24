@@ -16,14 +16,30 @@ import co.hoppen.cameralib.widget.UVCCameraTextureView;
 /**
  * Created by YangJianHui on 2022/9/28.
  */
-public class HoppenController implements ControllerFunction, OnUsbStatusListener, NotifyListener {
+public class HoppenController implements ControllerFunction, OnUsbStatusListener{
    private CameraDevice cameraDevice = new CameraDevice();
    private McuDevice mcuDevice;
 
    public HoppenController(HoppenCamera.CameraConfig cameraConfig){
-      cameraConfig.setNotifyListener(this);
       cameraDevice.setCameraConfig(cameraConfig);
       mcuDevice= new McuDevice(cameraConfig.getOnMoistureListener());
+      cameraConfig.setNotifyListener(new NotifyListener() {
+         @Override
+         public void onUpdateSurface(SurfaceTexture surfaceTexture) {
+            cameraDevice.updateSurface(surfaceTexture);
+         }
+
+         @Override
+         public void onPageStop() {
+            stopPreview();
+         }
+
+         @Override
+         public void onPageDestroy() {
+            LogUtils.e("onPageDestroy");
+            closeDevices();
+         }
+      });
    }
 
    @Override
@@ -142,21 +158,4 @@ public class HoppenController implements ControllerFunction, OnUsbStatusListener
       cameraDevice.sendInstruction(instruction);
       mcuDevice.sendInstruction(instruction);
    }
-
-   @Override
-   public void onUpdateSurface(SurfaceTexture surfaceTexture) {
-      cameraDevice.updateSurface(surfaceTexture);
-   }
-
-   @Override
-   public void onPageStop() {
-      stopPreview();
-   }
-
-   @Override
-   public void onPageDestroy() {
-      LogUtils.e("onPageDestroy");
-      closeDevices();
-   }
-
 }

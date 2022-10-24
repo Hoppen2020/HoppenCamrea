@@ -21,16 +21,15 @@
  *  may have a different license, see the respective files.
  */
 
-package com.jiangdg.uvc;
+package com.hoppen.uvc;
 
 import android.graphics.SurfaceTexture;
-import android.hardware.usb.UsbDevice;
 import android.text.TextUtils;
 import android.view.Surface;
 import android.view.SurfaceHolder;
 
 import com.blankj.utilcode.util.LogUtils;
-import com.jiangdg.utils.Size;
+import com.hoppen.utils.Size;
 
 import org.json.JSONArray;
 import org.json.JSONException;

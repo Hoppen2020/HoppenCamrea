@@ -22,6 +22,6 @@
   -->
 
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
-    package="com.jiangdg.uvccamera">
+    package="com.hoppen.uvccamera">
 
 </manifest>

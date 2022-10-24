@@ -1,4 +1,4 @@
-package com.jiangdg.uvc;
+package com.hoppen.uvc;
 
 public interface IButtonCallback {
     void onButton(int button, int state);

@@ -11,8 +11,8 @@ import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 
 
-import com.jiangdg.uvc.IButtonCallback;
-import com.jiangdg.uvc.UVCCamera;
+import com.hoppen.uvc.IButtonCallback;
+import com.hoppen.uvc.UVCCamera;
 
 import co.hoppen.cameralib.CallBack.CaptureCallback;
 import co.hoppen.cameralib.CallBack.OnDeviceListener;

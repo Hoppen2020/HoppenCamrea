@@ -2076,15 +2076,15 @@ static JNINativeMethod methods[] = {
 	{ "nativeConnect",					"(JIIIIILjava/lang/String;)I", (void *) nativeConnect },
 	{ "nativeRelease",					"(J)I", (void *) nativeRelease },
 
-	{ "nativeSetStatusCallback",		"(JLcom/jiangdg/uvc/IStatusCallback;)I", (void *) nativeSetStatusCallback },
-	{ "nativeSetButtonCallback",		"(JLcom/jiangdg/uvc/IButtonCallback;)I", (void *) nativeSetButtonCallback },
+	{ "nativeSetStatusCallback",		"(JLcom/hoppen/uvc/IStatusCallback;)I", (void *) nativeSetStatusCallback },
+	{ "nativeSetButtonCallback",		"(JLcom/hoppen/uvc/IButtonCallback;)I", (void *) nativeSetButtonCallback },
 
 	{ "nativeGetSupportedSize",			"(J)Ljava/lang/String;", (void *) nativeGetSupportedSize },
 	{ "nativeSetPreviewSize",			"(JIIIIIF)I", (void *) nativeSetPreviewSize },
 	{ "nativeStartPreview",				"(J)I", (void *) nativeStartPreview },
 	{ "nativeStopPreview",				"(J)I", (void *) nativeStopPreview },
 	{ "nativeSetPreviewDisplay",		"(JLandroid/view/Surface;)I", (void *) nativeSetPreviewDisplay },
-	{ "nativeSetFrameCallback",			"(JLcom/jiangdg/uvc/IFrameCallback;I)I", (void *) nativeSetFrameCallback },
+	{ "nativeSetFrameCallback",			"(JLcom/hoppen/uvc/IFrameCallback;I)I", (void *) nativeSetFrameCallback },
 
 	{ "nativeSetCaptureDisplay",		"(JLandroid/view/Surface;)I", (void *) nativeSetCaptureDisplay },
 
@@ -2253,7 +2253,7 @@ static JNINativeMethod methods[] = {
 int register_uvccamera(JNIEnv *env) {
 	LOGV("register_uvccamera:");
 	if (registerNativeMethods(env,
-		"com/jiangdg/uvc/UVCCamera",
+		"com/hoppen/uvc/UVCCamera",
 		methods, NUM_ARRAY_ELEMENTS(methods)) < 0) {
 		return -1;
 	}
