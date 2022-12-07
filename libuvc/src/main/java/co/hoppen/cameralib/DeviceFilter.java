@@ -122,7 +122,7 @@ public final class DeviceFilter {
 	 */
 	public static List<DeviceFilter> getDeviceFilters() {
 		//final Context context, final int deviceFilterXmlId
-		final XmlPullParser parser = Utils.getApp().getResources().getXml(R.xml.usbdevice_filter);
+		final XmlPullParser parser = Utils.getApp().getResources().getXml(R.xml.usb_camera_device_filter);
 		final List<DeviceFilter> deviceFilters = new ArrayList<DeviceFilter>();
 		try {
 			int eventType = parser.getEventType();
