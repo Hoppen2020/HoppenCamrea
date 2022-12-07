@@ -6,7 +6,7 @@ import android.os.Looper;
 import android.os.Process;
 
 /**
- * Created by tianjiangwei on 2017/9/28.
+ *
  */
 
 public abstract class Task implements Runnable {

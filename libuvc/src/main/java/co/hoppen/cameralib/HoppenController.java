@@ -101,6 +101,9 @@ public class HoppenController implements ControllerFunction, OnUsbStatusListener
       send(instruction);
    }
 
+   /**
+    * 获取水分值
+    */
    @Override
    public void getMoisture() {
       if (cameraDevice.getDeviceConfig()!=null && !cameraDevice.getDeviceConfig().isMcuCommunication()){
@@ -108,52 +111,92 @@ public class HoppenController implements ControllerFunction, OnUsbStatusListener
       }else send(Instruction.MOISTURE);
    }
 
+   /**
+    * 获取设备号
+    */
    @Override
    public void getProductCode() {
       send(Instruction.PRODUCT_CODE);
    }
 
+   /**
+    * 获取设备唯一编码
+    */
    @Override
    public void getUniqueCode() {
       send(Instruction.UNIQUE_CODE);
    }
 
+   /**
+    * 开始预览
+    */
    @Override
    public void startPreview() {
       cameraDevice.startPreview();
    }
 
+   /**
+    * 停止预览
+    */
    @Override
    public void stopPreview() {
       cameraDevice.stopPreview();
    }
 
+   /**
+    * 关闭设备
+    */
    @Override
    public void closeDevices() {
       cameraDevice.closeDevice();
       mcuDevice.closeDevice();
    }
 
+   /**
+    * 流截图
+    * @param captureCallback
+    */
    @Override
    public void capturePicture(CaptureCallback captureCallback) {
       cameraDevice.captureImageInternal(0,0,captureCallback);
    }
 
+   /**
+    * 流截图
+    * @param width
+    * @param height
+    * @param captureCallback
+    */
    @Override
    public void capturePicture(int width, int height,CaptureCallback captureCallback) {
       cameraDevice.captureImageInternal(width,height,captureCallback);
    }
 
+
+   /**
+    * 控件截图
+    * @param captureCallback
+    */
    @Override
    public void captureViewPicture(CaptureCallback captureCallback) {
       cameraDevice.captureImageByViewInternal(0,0,captureCallback);
    }
 
+   /**
+    * 控件截图
+    * @param width
+    * @param height
+    * @param captureCallback
+    */
    @Override
    public void captureViewPicture(int width, int height, CaptureCallback captureCallback) {
       cameraDevice.captureImageByViewInternal(width,height,captureCallback);
    }
 
+   /**
+    * 发送指令
+    * @param instruction
+    */
    private void send(Instruction instruction){
       cameraDevice.sendInstruction(instruction);
       mcuDevice.sendInstruction(instruction);
