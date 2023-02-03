@@ -213,6 +213,7 @@ public class McuDevice extends Device{
 
    @Override
    void closeDevice() {
+      onMoistureListener = null;
       if (connectMcuInfo != null) {
          try {
             if (autoSystemOnlineTask!=null){
