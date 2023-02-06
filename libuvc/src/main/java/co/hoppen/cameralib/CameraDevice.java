@@ -266,7 +266,7 @@ public class CameraDevice extends Device{
 
     public void startPreview(){
         try {
-            if (uvcCamera!=null && cameraConfig!=null){
+            if (uvcCamera!=null && cameraConfig!=null && cameraConfig.getSurfaceTexture()!=null){
                 if (surface==null){
                     surface = new Surface(cameraConfig.getSurfaceTexture());
                 }
@@ -317,7 +317,7 @@ public class CameraDevice extends Device{
         if (surface!=null){
             surface.release();
             surface = new Surface(surfaceTexture);
-            startPreview();
+//            startPreview();
         }
     }
 
@@ -327,7 +327,7 @@ public class CameraDevice extends Device{
             public Bitmap doInBackground() throws Throwable {
                 Bitmap captureBitmap = null;
 
-                if (cameraConfig!=null && cameraConfig.getTextureView()!=null&&captureCallback!=null){
+                if (cameraConfig!=null && cameraConfig.getTextureView()!=null && captureCallback!=null){
                     UVCCameraTextureView textureView = cameraConfig.getTextureView();
                     if (width!=0 && height!=0){
                         captureBitmap = textureView.getBitmap(width,height);

@@ -7,6 +7,7 @@ import android.graphics.SurfaceTexture;
  */
 public interface NotifyListener {
   void onUpdateSurface(SurfaceTexture surfaceTexture);
+  void onPageResume();
   void onPageStop();
   void onPageDestroy();
 }

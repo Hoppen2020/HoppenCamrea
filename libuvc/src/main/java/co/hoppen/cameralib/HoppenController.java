@@ -30,8 +30,16 @@ public class HoppenController implements ControllerFunction, OnUsbStatusListener
          }
 
          @Override
+         public void onPageResume() {
+            LogUtils.e("onPageResume");
+            startPreview();
+            mcuDevice.startSystemOnline();
+         }
+
+         @Override
          public void onPageStop() {
             stopPreview();
+            mcuDevice.stopSystemOnline();
          }
 
          @Override

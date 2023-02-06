@@ -84,10 +84,6 @@ public class McuDevice extends Device{
                ConnectMcuDeviceTask.ConnectMcuInfo connectMcuInfo = task.getConnectMcuInfo();
                if (connectMcuInfo.isConform()){
                   McuDevice.this.connectMcuInfo = connectMcuInfo;
-                  LogUtils.e(connectMcuInfo.getCompatibleMode());
-                  if (connectMcuInfo.getCompatibleMode()== MODE_AUTO){
-                     ThreadUtils.executeByFixedAtFixRate(1, autoSystemOnlineTask, 5, 30, TimeUnit.SECONDS);
-                  }
                   readDataThread = new Thread(readRunnable);
                   readDataThread.start();
                }
@@ -214,9 +210,9 @@ public class McuDevice extends Device{
 
    @Override
    void closeDevice() {
+      LogUtils.e("mcuDevice closeDevice");
       if (connectMcuInfo != null) {
          try {
-            ThreadUtils.cancel(autoSystemOnlineTask);
             UsbDeviceConnection usbDeviceConnection = connectMcuInfo.getUsbDeviceConnection();
             usbDeviceConnection.releaseInterface(connectMcuInfo.getUsbInterface());
             usbDeviceConnection.close();
@@ -224,5 +220,18 @@ public class McuDevice extends Device{
          } catch (Exception e) {
          }
       }
+   }
+
+   public void startSystemOnline(){
+         if (connectMcuInfo!=null){
+            LogUtils.e(connectMcuInfo.getCompatibleMode());
+            if (connectMcuInfo.getCompatibleMode()== MODE_AUTO){
+               ThreadUtils.executeByFixedAtFixRate(1, autoSystemOnlineTask, 5, 30, TimeUnit.SECONDS);
+            }
+         }
+   }
+
+   public void stopSystemOnline(){
+      ThreadUtils.cancel(autoSystemOnlineTask);
    }
 }

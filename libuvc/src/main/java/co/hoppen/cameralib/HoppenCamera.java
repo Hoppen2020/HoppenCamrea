@@ -32,20 +32,18 @@ public class HoppenCamera{
    }
 
    private HoppenController createController(CameraConfig cameraConfig){
-      WeakReference<Context> contextWeakReference= new WeakReference<>(cameraConfig.textureView.getContext());
+      WeakReference<Context> contextWeakReference= new WeakReference<>(cameraConfig.textureView.get().getContext());
       Context context = contextWeakReference.get();
       if (context==null)return null;
       if (!(context instanceof LifecycleOwner)) return null;
       HoppenController controller = new HoppenController(cameraConfig);
-      cameraConfig.textureView.setSurfaceTextureListener(new TextureView.SurfaceTextureListener() {
+      cameraConfig.textureView.get().setSurfaceTextureListener(new TextureView.SurfaceTextureListener() {
           @Override
           public void onSurfaceTextureAvailable(SurfaceTexture surface, int width, int height) {
-              LogUtils.e(surface.toString());
               if (cameraConfig.surfaceTexture==null){
                   cameraConfig.surfaceTexture = surface;
               }else {
                   if (cameraConfig.getNotifyListener()!=null){
-                      LogUtils.e(cameraConfig.surfaceTexture.toString(),surface.toString());
                       cameraConfig.surfaceTexture = surface;
                       cameraConfig.getNotifyListener().onUpdateSurface(surface);
                   }
@@ -60,7 +58,11 @@ public class HoppenCamera{
                               usbMonitor.connectListDevice(contextWeakReference.get());
                           }else if (event.equals(Lifecycle.Event.ON_START)){
                               usbMonitor.register(contextWeakReference.get());
-                          }else if (event.equals(Lifecycle.Event.ON_STOP)){
+                          }else if (event.equals(Lifecycle.Event.ON_RESUME)){
+                              if (cameraConfig.getNotifyListener()!=null){
+                                  cameraConfig.getNotifyListener().onPageResume();
+                              }
+                          } else if (event.equals(Lifecycle.Event.ON_STOP)){
                               usbMonitor.unregister(contextWeakReference.get());
                               if (cameraConfig.getNotifyListener()!=null){
                                   cameraConfig.getNotifyListener().onPageStop();
@@ -94,7 +96,7 @@ public class HoppenCamera{
 
       public Builder(UVCCameraTextureView textureView){
           cameraConfig = new CameraConfig();
-          cameraConfig.textureView = textureView;
+          cameraConfig.textureView = new WeakReference<>(textureView);
       }
 
       public Builder setCameraButtonListener(IButtonCallback cameraButtonListener){
@@ -136,13 +138,15 @@ public class HoppenCamera{
 
    public static class CameraConfig{
        private SurfaceTexture surfaceTexture;
-       private UVCCameraTextureView textureView;
        private int resolutionWidth;
        private int resolutionHeight;
        private int frameFormat = FRAME_FORMAT_MJPEG;
        private String devicePathName = "";
        private NotifyListener notifyListener;
        //一下容易出现内存泄露对象
+
+
+       private WeakReference<UVCCameraTextureView> textureView;
 
        private WeakReference<OnDeviceListener> onDeviceListener;
 //       private OnDeviceListener onDeviceListener;
@@ -178,7 +182,7 @@ public class HoppenCamera{
        }
 
        public UVCCameraTextureView getTextureView() {
-           return textureView;
+           return textureView!=null?textureView.get():null;
        }
 
        public IButtonCallback getCameraButtonListener() {
