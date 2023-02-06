@@ -31,7 +31,7 @@ public class UsbMonitor{
     private Map<String,UsbDevice> doubleCheckMap = new HashMap<>();//某些平板厂商需要用到doublecheck
 
     public UsbMonitor(OnUsbStatusListener onUsbStatusListener){
-        usbManager = (UsbManager) Utils.getApp().getSystemService(Context.USB_SERVICE);
+        usbManager = (UsbManager) Utils.getApp().getApplicationContext().getSystemService(Context.USB_SERVICE);
         if (onUsbStatusListener!=null){
             this.onUsbStatusListener = onUsbStatusListener;
             filterList = DeviceFilter.getDeviceFilters();
@@ -40,7 +40,7 @@ public class UsbMonitor{
     }
 
     public UsbMonitor(){
-        usbManager = (UsbManager) Utils.getApp().getSystemService(Context.USB_SERVICE);
+        usbManager = (UsbManager) Utils.getApp().getApplicationContext().getSystemService(Context.USB_SERVICE);
     }
 
     public void setOnUsbStatusListener(OnUsbStatusListener onUsbStatusListener) {

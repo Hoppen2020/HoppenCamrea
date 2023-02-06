@@ -37,7 +37,7 @@ public class ConnectMcuDeviceTask extends Task{
    @Override
    public void taskContent() {
       if (connectMcuInfo!=null){
-         UsbManager usbManager = (UsbManager) Utils.getApp().getSystemService(Context.USB_SERVICE);
+         UsbManager usbManager = (UsbManager) Utils.getApp().getApplicationContext().getSystemService(Context.USB_SERVICE);
          UsbDevice usbDevice = connectMcuInfo.usbDevice;
          UsbDeviceConnection usbDeviceConnection = usbManager.openDevice(usbDevice);
          int interfaceCount = usbDevice.getInterfaceCount();

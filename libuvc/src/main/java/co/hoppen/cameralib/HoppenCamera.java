@@ -53,7 +53,9 @@ public class HoppenCamera{
                   ((LifecycleOwner)context).getLifecycle().addObserver(new LifecycleEventObserver() {
                       @Override
                       public void onStateChanged(@NonNull LifecycleOwner source, @NonNull Lifecycle.Event event) {
+                          LogUtils.e(usbMonitor==null,contextWeakReference.get()==null);
                           if (usbMonitor==null)return;
+                          if (contextWeakReference.get()==null)return;
                           if (event.equals(Lifecycle.Event.ON_CREATE)){
                               usbMonitor.connectListDevice(contextWeakReference.get());
                           }else if (event.equals(Lifecycle.Event.ON_START)){
