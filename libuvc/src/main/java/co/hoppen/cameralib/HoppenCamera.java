@@ -53,7 +53,7 @@ public class HoppenCamera{
                   ((LifecycleOwner)context).getLifecycle().addObserver(new LifecycleEventObserver() {
                       @Override
                       public void onStateChanged(@NonNull LifecycleOwner source, @NonNull Lifecycle.Event event) {
-                          LogUtils.e(usbMonitor==null,contextWeakReference.get()==null);
+                          //LogUtils.e(usbMonitor==null,contextWeakReference.get()==null);
                           if (usbMonitor==null)return;
                           if (contextWeakReference.get()==null)return;
                           if (event.equals(Lifecycle.Event.ON_CREATE)){
@@ -145,8 +145,8 @@ public class HoppenCamera{
        private int frameFormat = FRAME_FORMAT_MJPEG;
        private String devicePathName = "";
        private NotifyListener notifyListener;
-       //一下容易出现内存泄露对象
 
+       //一下容易出现内存泄露对象
 
        private WeakReference<UVCCameraTextureView> textureView;
 

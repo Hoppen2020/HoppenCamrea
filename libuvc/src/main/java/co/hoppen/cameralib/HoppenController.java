@@ -1,17 +1,12 @@
 package co.hoppen.cameralib;
 
-import android.graphics.Bitmap;
 import android.graphics.SurfaceTexture;
 import android.hardware.usb.UsbDevice;
-
-import com.blankj.utilcode.util.LogUtils;
-import com.blankj.utilcode.util.ThreadUtils;
 
 import co.hoppen.cameralib.CallBack.CaptureCallback;
 import co.hoppen.cameralib.CallBack.ControllerFunction;
 import co.hoppen.cameralib.CallBack.NotifyListener;
 import co.hoppen.cameralib.CallBack.OnUsbStatusListener;
-import co.hoppen.cameralib.widget.UVCCameraTextureView;
 
 /**
  * Created by YangJianHui on 2022/9/28.
@@ -31,7 +26,6 @@ public class HoppenController implements ControllerFunction, OnUsbStatusListener
 
          @Override
          public void onPageResume() {
-            LogUtils.e("onPageResume");
             startPreview();
             mcuDevice.startSystemOnline();
          }
@@ -44,7 +38,6 @@ public class HoppenController implements ControllerFunction, OnUsbStatusListener
 
          @Override
          public void onPageDestroy() {
-            LogUtils.e("onPageDestroy");
             closeDevices();
          }
       });

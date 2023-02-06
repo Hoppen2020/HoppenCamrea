@@ -226,7 +226,7 @@ public class McuDevice extends Device{
          if (connectMcuInfo!=null){
             LogUtils.e(connectMcuInfo.getCompatibleMode());
             if (connectMcuInfo.getCompatibleMode()== MODE_AUTO){
-               ThreadUtils.executeByFixedAtFixRate(1, autoSystemOnlineTask, 5, 30, TimeUnit.SECONDS);
+               ThreadUtils.executeByFixedAtFixRate(1,autoSystemOnlineTask,30,TimeUnit.SECONDS);
             }
          }
    }
