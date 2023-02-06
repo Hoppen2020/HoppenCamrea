@@ -35,6 +35,7 @@ public class CameraDevice extends Device{
     private DeviceConfig deviceConfig;
     //内置摄像头设置
     private HoppenCamera.CameraConfig cameraConfig;
+
     private final String DEVICE_NAME = "Device_Name";
 
     private Surface surface;
@@ -58,7 +59,7 @@ public class CameraDevice extends Device{
     @Override
     void sendInstruction(Instruction instruction) {
         //异步发送指令
-        if (uvcCamera!=null && instruction!=null &&cameraConfig!=null){
+        if (uvcCamera!=null && instruction!=null && cameraConfig!=null){
             if (!deviceConfig.isMcuCommunication()){
                 ThreadUtils.executeByFixed(5, new ThreadUtils.SimpleTask<Map<Instruction, Object>>() {
                     @Override
@@ -269,7 +270,9 @@ public class CameraDevice extends Device{
                 if (surface==null){
                     surface = new Surface(cameraConfig.getSurfaceTexture());
                 }
-                uvcCamera.setButtonCallback(cameraConfig.getCameraButtonListener());
+                if (cameraConfig.getCameraButtonListener()!=null){
+                    uvcCamera.setButtonCallback(cameraConfig.getCameraButtonListener());
+                }
                 uvcCamera.setPreviewDisplay(surface);
                 //****
                 uvcCamera.setFrameCallback(new IFrameCallback() {

@@ -98,7 +98,7 @@ public class HoppenCamera{
       }
 
       public Builder setCameraButtonListener(IButtonCallback cameraButtonListener){
-          cameraConfig.cameraButtonListener = cameraButtonListener;
+          cameraConfig.cameraButtonListener = new WeakReference<>(cameraButtonListener);
           return this;
       }
 
@@ -109,7 +109,7 @@ public class HoppenCamera{
       }
 
       public Builder setOnDeviceListener(OnDeviceListener onDeviceListener) {
-         cameraConfig.onDeviceListener = onDeviceListener;
+         cameraConfig.onDeviceListener = new WeakReference<>(onDeviceListener);
          return this;
       }
 
@@ -119,12 +119,12 @@ public class HoppenCamera{
       }
 
       public Builder setOnMoistureListener(OnMoistureListener onMoistureListener) {
-         cameraConfig.onMoistureListener = onMoistureListener;
+         cameraConfig.onMoistureListener = new WeakReference<>(onMoistureListener);
          return this;
       }
 
       public Builder setOnInfoListener(OnInfoListener onInfoListener) {
-         cameraConfig.onInfoListener = onInfoListener;
+         cameraConfig.onInfoListener = new WeakReference<>(onInfoListener);
          return this;
       }
 
@@ -139,14 +139,19 @@ public class HoppenCamera{
        private UVCCameraTextureView textureView;
        private int resolutionWidth;
        private int resolutionHeight;
-       private OnDeviceListener onDeviceListener;
        private int frameFormat = FRAME_FORMAT_MJPEG;
-       private OnMoistureListener onMoistureListener;
-       private OnInfoListener onInfoListener;
-       private IButtonCallback cameraButtonListener;
        private String devicePathName = "";
        private NotifyListener notifyListener;
+       //一下容易出现内存泄露对象
 
+       private WeakReference<OnDeviceListener> onDeviceListener;
+//       private OnDeviceListener onDeviceListener;
+       private WeakReference<OnMoistureListener> onMoistureListener;
+//       private OnMoistureListener onMoistureListener;
+       private WeakReference<OnInfoListener> onInfoListener;
+//       private OnInfoListener onInfoListener;
+       private WeakReference<IButtonCallback> cameraButtonListener;
+//       private IButtonCallback cameraButtonListener;
 
        public int getResolutionWidth() {
            return resolutionWidth;
@@ -157,7 +162,7 @@ public class HoppenCamera{
        }
 
        public OnDeviceListener getOnDeviceListener() {
-           return onDeviceListener;
+           return onDeviceListener!=null?onDeviceListener.get():null;
        }
 
        public int getFrameFormat() {
@@ -165,11 +170,11 @@ public class HoppenCamera{
        }
 
        public OnMoistureListener getOnMoistureListener() {
-           return onMoistureListener;
+           return onMoistureListener!=null?onMoistureListener.get():null;
        }
 
        public OnInfoListener getOnInfoListener() {
-           return onInfoListener;
+           return onInfoListener!=null?onInfoListener.get():null;
        }
 
        public UVCCameraTextureView getTextureView() {
@@ -177,7 +182,7 @@ public class HoppenCamera{
        }
 
        public IButtonCallback getCameraButtonListener() {
-           return cameraButtonListener;
+           return cameraButtonListener!=null?cameraButtonListener.get():null;
        }
 
        public SurfaceTexture getSurfaceTexture() {

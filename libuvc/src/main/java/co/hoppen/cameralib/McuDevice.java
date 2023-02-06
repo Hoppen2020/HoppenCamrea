@@ -23,12 +23,13 @@ import static co.hoppen.cameralib.CompatibleMode.MODE_SINGLE;
 public class McuDevice extends Device{
    private final static int DEFAULT_MAX_READ_BYTES = 128;
    private final static int DEFAULT_TIMEOUT = 300;
-   private TaskQueue taskQueue = new TaskQueue();
+   private final TaskQueue taskQueue = new TaskQueue();
    private ConnectMcuDeviceTask.ConnectMcuInfo connectMcuInfo;
    private Thread readDataThread;
-   private OnMoistureListener onMoistureListener;
+//   private OnMoistureListener onMoistureListener;
+   private HoppenCamera.CameraConfig cameraConfig;
 
-   private ThreadUtils.Task autoSystemOnlineTask = new ThreadUtils.SimpleTask<Object>() {
+   private final ThreadUtils.Task<Object> autoSystemOnlineTask = new ThreadUtils.SimpleTask<Object>() {
       @Override
       public Object doInBackground() throws Throwable {
 //         LogUtils.e("autoSystemOnlineTask");
@@ -40,7 +41,7 @@ public class McuDevice extends Device{
       }
    };
 
-   private Runnable readRunnable = new Runnable() {
+   private final Runnable readRunnable = new Runnable() {
       @Override
       public void run() {
          while (connectMcuInfo!=null && connectMcuInfo.getUsbDeviceConnection()!=null){
@@ -56,9 +57,9 @@ public class McuDevice extends Device{
 
                      @Override
                      public void onSuccess(Float result) {
-                        if (onMoistureListener!=null){
+                        if (cameraConfig.getOnMoistureListener()!=null){
                            if (result>=0){
-                              onMoistureListener.onMoistureCallBack(result);
+                              cameraConfig.getOnMoistureListener().onMoistureCallBack(result);
                            }
                         }
                      }
@@ -71,13 +72,12 @@ public class McuDevice extends Device{
    };
 
 
-   public McuDevice(OnMoistureListener onMoistureListener){
-      this.onMoistureListener = onMoistureListener;
+   public McuDevice(HoppenCamera.CameraConfig cameraConfig){
+      this.cameraConfig = cameraConfig;
    }
 
    @Override
    void onConnecting(UsbDevice usbDevice) {
-      if (taskQueue!=null){
          taskQueue.addTask(new ConnectMcuDeviceTask(usbDevice), new TaskQueue.CurrentTaskFinish<ConnectMcuDeviceTask>() {
             @Override
             public void onFinish(ConnectMcuDeviceTask task) {
@@ -93,7 +93,6 @@ public class McuDevice extends Device{
                }
             }
          });
-      }
    }
 
    private byte[] readData(){
@@ -188,8 +187,10 @@ public class McuDevice extends Device{
 
             @Override
             public void onSuccess(Integer result) {
-               if (result==-1){
-                  if (onMoistureListener!=null)onMoistureListener.onMoistureCallBack(result);
+               if (cameraConfig.getOnMoistureListener()!=null){
+                  if (result==-1){
+                     cameraConfig.getOnMoistureListener().onMoistureCallBack(result);
+                  }
                }
             }
          });
@@ -213,12 +214,9 @@ public class McuDevice extends Device{
 
    @Override
    void closeDevice() {
-      onMoistureListener = null;
       if (connectMcuInfo != null) {
          try {
-            if (autoSystemOnlineTask!=null){
-               ThreadUtils.cancel(autoSystemOnlineTask);
-            }
+            ThreadUtils.cancel(autoSystemOnlineTask);
             UsbDeviceConnection usbDeviceConnection = connectMcuInfo.getUsbDeviceConnection();
             usbDeviceConnection.releaseInterface(connectMcuInfo.getUsbInterface());
             usbDeviceConnection.close();
