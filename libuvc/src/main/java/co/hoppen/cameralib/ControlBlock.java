@@ -25,7 +25,7 @@ public class ControlBlock {
 
     public UsbDeviceConnection open() {
         if (mUsbDevice != null) {
-            UsbManager usbManager = (UsbManager) Utils.getApp().getApplicationContext().getSystemService(Context.USB_SERVICE);
+            UsbManager usbManager = (UsbManager) Utils.getApp().getSystemService(Context.USB_SERVICE);
             mUsbConnection = usbManager.openDevice(mUsbDevice);
         }
         return mUsbConnection;

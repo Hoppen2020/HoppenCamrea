@@ -32,18 +32,20 @@ public class HoppenCamera{
    }
 
    private HoppenController createController(CameraConfig cameraConfig){
-      WeakReference<Context> contextWeakReference= new WeakReference<>(cameraConfig.textureView.get().getContext());
+      WeakReference<Context> contextWeakReference= new WeakReference<>(cameraConfig.textureView.getContext());
       Context context = contextWeakReference.get();
       if (context==null)return null;
       if (!(context instanceof LifecycleOwner)) return null;
       HoppenController controller = new HoppenController(cameraConfig);
-      cameraConfig.textureView.get().setSurfaceTextureListener(new TextureView.SurfaceTextureListener() {
+      cameraConfig.textureView.setSurfaceTextureListener(new TextureView.SurfaceTextureListener() {
           @Override
           public void onSurfaceTextureAvailable(SurfaceTexture surface, int width, int height) {
+              LogUtils.e(surface.toString());
               if (cameraConfig.surfaceTexture==null){
                   cameraConfig.surfaceTexture = surface;
               }else {
                   if (cameraConfig.getNotifyListener()!=null){
+                      LogUtils.e(cameraConfig.surfaceTexture.toString(),surface.toString());
                       cameraConfig.surfaceTexture = surface;
                       cameraConfig.getNotifyListener().onUpdateSurface(surface);
                   }
@@ -53,17 +55,15 @@ public class HoppenCamera{
                   ((LifecycleOwner)context).getLifecycle().addObserver(new LifecycleEventObserver() {
                       @Override
                       public void onStateChanged(@NonNull LifecycleOwner source, @NonNull Lifecycle.Event event) {
-                          //LogUtils.e(usbMonitor==null,contextWeakReference.get()==null);
                           if (usbMonitor==null)return;
-                          if (contextWeakReference.get()==null)return;
                           if (event.equals(Lifecycle.Event.ON_CREATE)){
                               usbMonitor.connectListDevice(contextWeakReference.get());
                           }else if (event.equals(Lifecycle.Event.ON_START)){
                               usbMonitor.register(contextWeakReference.get());
                           }else if (event.equals(Lifecycle.Event.ON_RESUME)){
-                              if (cameraConfig.getNotifyListener()!=null){
-                                  cameraConfig.getNotifyListener().onPageResume();
-                              }
+                             if (cameraConfig.getNotifyListener()!=null){
+                                 cameraConfig.getNotifyListener().onPageResume();
+                             }
                           } else if (event.equals(Lifecycle.Event.ON_STOP)){
                               usbMonitor.unregister(contextWeakReference.get());
                               if (cameraConfig.getNotifyListener()!=null){
@@ -98,11 +98,11 @@ public class HoppenCamera{
 
       public Builder(UVCCameraTextureView textureView){
           cameraConfig = new CameraConfig();
-          cameraConfig.textureView = new WeakReference<>(textureView);
+          cameraConfig.textureView = textureView;
       }
 
       public Builder setCameraButtonListener(IButtonCallback cameraButtonListener){
-          cameraConfig.cameraButtonListener = new WeakReference<>(cameraButtonListener);
+          cameraConfig.cameraButtonListener = cameraButtonListener;
           return this;
       }
 
@@ -113,7 +113,7 @@ public class HoppenCamera{
       }
 
       public Builder setOnDeviceListener(OnDeviceListener onDeviceListener) {
-         cameraConfig.onDeviceListener = new WeakReference<>(onDeviceListener);
+         cameraConfig.onDeviceListener = onDeviceListener;
          return this;
       }
 
@@ -123,12 +123,12 @@ public class HoppenCamera{
       }
 
       public Builder setOnMoistureListener(OnMoistureListener onMoistureListener) {
-         cameraConfig.onMoistureListener = new WeakReference<>(onMoistureListener);
+         cameraConfig.onMoistureListener = onMoistureListener;
          return this;
       }
 
       public Builder setOnInfoListener(OnInfoListener onInfoListener) {
-         cameraConfig.onInfoListener = new WeakReference<>(onInfoListener);
+         cameraConfig.onInfoListener = onInfoListener;
          return this;
       }
 
@@ -140,24 +140,17 @@ public class HoppenCamera{
 
    public static class CameraConfig{
        private SurfaceTexture surfaceTexture;
+       private UVCCameraTextureView textureView;
        private int resolutionWidth;
        private int resolutionHeight;
+       private OnDeviceListener onDeviceListener;
        private int frameFormat = FRAME_FORMAT_MJPEG;
+       private OnMoistureListener onMoistureListener;
+       private OnInfoListener onInfoListener;
+       private IButtonCallback cameraButtonListener;
        private String devicePathName = "";
        private NotifyListener notifyListener;
 
-       //一下容易出现内存泄露对象
-
-       private WeakReference<UVCCameraTextureView> textureView;
-
-       private WeakReference<OnDeviceListener> onDeviceListener;
-//       private OnDeviceListener onDeviceListener;
-       private WeakReference<OnMoistureListener> onMoistureListener;
-//       private OnMoistureListener onMoistureListener;
-       private WeakReference<OnInfoListener> onInfoListener;
-//       private OnInfoListener onInfoListener;
-       private WeakReference<IButtonCallback> cameraButtonListener;
-//       private IButtonCallback cameraButtonListener;
 
        public int getResolutionWidth() {
            return resolutionWidth;
@@ -168,7 +161,7 @@ public class HoppenCamera{
        }
 
        public OnDeviceListener getOnDeviceListener() {
-           return onDeviceListener!=null?onDeviceListener.get():null;
+           return onDeviceListener;
        }
 
        public int getFrameFormat() {
@@ -176,19 +169,19 @@ public class HoppenCamera{
        }
 
        public OnMoistureListener getOnMoistureListener() {
-           return onMoistureListener!=null?onMoistureListener.get():null;
+           return onMoistureListener;
        }
 
        public OnInfoListener getOnInfoListener() {
-           return onInfoListener!=null?onInfoListener.get():null;
+           return onInfoListener;
        }
 
        public UVCCameraTextureView getTextureView() {
-           return textureView!=null?textureView.get():null;
+           return textureView;
        }
 
        public IButtonCallback getCameraButtonListener() {
-           return cameraButtonListener!=null?cameraButtonListener.get():null;
+           return cameraButtonListener;
        }
 
        public SurfaceTexture getSurfaceTexture() {

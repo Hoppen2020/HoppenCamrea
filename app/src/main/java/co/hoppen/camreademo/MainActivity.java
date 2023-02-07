@@ -2,7 +2,6 @@ package co.hoppen.camreademo;
 
 import android.content.Intent;
 import android.os.Bundle;
-import android.os.Handler;
 import android.view.View;
 
 import androidx.annotation.Nullable;

@@ -35,7 +35,6 @@ public class CameraDevice extends Device{
     private DeviceConfig deviceConfig;
     //内置摄像头设置
     private HoppenCamera.CameraConfig cameraConfig;
-
     private final String DEVICE_NAME = "Device_Name";
 
     private Surface surface;
@@ -43,6 +42,8 @@ public class CameraDevice extends Device{
     private LinkedBlockingDeque<byte[]> mNV21DataQueue = new LinkedBlockingDeque<>();
 
     private boolean capturing = false;
+
+//    private Boolean manualStopPreview = null;
 
     public void setCameraConfig(HoppenCamera.CameraConfig cameraConfig) {
         this.cameraConfig = cameraConfig;
@@ -59,7 +60,7 @@ public class CameraDevice extends Device{
     @Override
     void sendInstruction(Instruction instruction) {
         //异步发送指令
-        if (uvcCamera!=null && instruction!=null && cameraConfig!=null){
+        if (uvcCamera!=null && instruction!=null &&cameraConfig!=null){
             if (!deviceConfig.isMcuCommunication()){
                 ThreadUtils.executeByFixed(5, new ThreadUtils.SimpleTask<Map<Instruction, Object>>() {
                     @Override
@@ -266,13 +267,13 @@ public class CameraDevice extends Device{
 
     public void startPreview(){
         try {
-            if (uvcCamera!=null && cameraConfig!=null && cameraConfig.getSurfaceTexture()!=null){
+//            if (manualStopPreview!=null && !manualStopPreview)return;
+//            if (manualStopPreview!=null)manualStopPreview = false;
+            if (uvcCamera!=null && cameraConfig!=null){
                 if (surface==null){
                     surface = new Surface(cameraConfig.getSurfaceTexture());
                 }
-                if (cameraConfig.getCameraButtonListener()!=null){
-                    uvcCamera.setButtonCallback(cameraConfig.getCameraButtonListener());
-                }
+                uvcCamera.setButtonCallback(cameraConfig.getCameraButtonListener());
                 uvcCamera.setPreviewDisplay(surface);
                 //****
                 uvcCamera.setFrameCallback(new IFrameCallback() {
@@ -299,6 +300,7 @@ public class CameraDevice extends Device{
 
     public void stopPreview(){
         try {
+//            if (manualStopPreview==null)manualStopPreview = true;
             LogUtils.e("stopPreview");
             if (mNV21DataQueue!=null){
                 mNV21DataQueue.clear();
@@ -317,7 +319,7 @@ public class CameraDevice extends Device{
         if (surface!=null){
             surface.release();
             surface = new Surface(surfaceTexture);
-//            startPreview();
+            startPreview();
         }
     }
 
@@ -327,7 +329,7 @@ public class CameraDevice extends Device{
             public Bitmap doInBackground() throws Throwable {
                 Bitmap captureBitmap = null;
 
-                if (cameraConfig!=null && cameraConfig.getTextureView()!=null && captureCallback!=null){
+                if (cameraConfig!=null && cameraConfig.getTextureView()!=null&&captureCallback!=null){
                     UVCCameraTextureView textureView = cameraConfig.getTextureView();
                     if (width!=0 && height!=0){
                         captureBitmap = textureView.getBitmap(width,height);

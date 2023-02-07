@@ -1,23 +1,29 @@
 package co.hoppen.cameralib;
 
+import android.graphics.Bitmap;
 import android.graphics.SurfaceTexture;
 import android.hardware.usb.UsbDevice;
+
+import com.blankj.utilcode.util.LogUtils;
+import com.blankj.utilcode.util.ThreadUtils;
 
 import co.hoppen.cameralib.CallBack.CaptureCallback;
 import co.hoppen.cameralib.CallBack.ControllerFunction;
 import co.hoppen.cameralib.CallBack.NotifyListener;
 import co.hoppen.cameralib.CallBack.OnUsbStatusListener;
+import co.hoppen.cameralib.widget.UVCCameraTextureView;
 
 /**
  * Created by YangJianHui on 2022/9/28.
  */
 public class HoppenController implements ControllerFunction, OnUsbStatusListener{
-   private final CameraDevice cameraDevice = new CameraDevice();
-   private final McuDevice mcuDevice;
+   private CameraDevice cameraDevice = new CameraDevice();
+   private McuDevice mcuDevice;
+   private Boolean stopPreview = null;
 
    public HoppenController(HoppenCamera.CameraConfig cameraConfig){
       cameraDevice.setCameraConfig(cameraConfig);
-      mcuDevice= new McuDevice(cameraConfig);
+      mcuDevice= new McuDevice(cameraConfig.getOnMoistureListener());
       cameraConfig.setNotifyListener(new NotifyListener() {
          @Override
          public void onUpdateSurface(SurfaceTexture surfaceTexture) {
@@ -26,18 +32,21 @@ public class HoppenController implements ControllerFunction, OnUsbStatusListener
 
          @Override
          public void onPageResume() {
-            startPreview();
-            mcuDevice.startSystemOnline();
+            if (stopPreview!=null && stopPreview){
+               stopPreview = false;
+               startPreview();
+            }
          }
 
          @Override
          public void onPageStop() {
+            stopPreview = true;
             stopPreview();
-            mcuDevice.stopSystemOnline();
          }
 
          @Override
          public void onPageDestroy() {
+            LogUtils.e("onPageDestroy");
             closeDevices();
          }
       });

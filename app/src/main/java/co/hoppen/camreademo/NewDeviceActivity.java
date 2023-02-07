@@ -1,6 +1,5 @@
 package co.hoppen.camreademo;
 
-import android.content.Intent;
 import android.graphics.Bitmap;
 import android.os.Bundle;
 import android.util.Log;
@@ -41,14 +40,6 @@ public class NewDeviceActivity extends AppCompatActivity implements OnMoistureLi
               .setOnInfoListener(this)
               .setFrameFormat(UVCCamera.FRAME_FORMAT_MJPEG)
               .build();
-      findViewById(R.id.tv_status).setOnLongClickListener(new View.OnLongClickListener() {
-         @Override
-         public boolean onLongClick(View view) {
-            startActivity(new Intent(NewDeviceActivity.this,MainActivity.class));
-            finish();
-            return true;
-         }
-      });
    }
 
    public void onClick(View view){
