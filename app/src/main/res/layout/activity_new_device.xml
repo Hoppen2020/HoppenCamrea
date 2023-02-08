@@ -73,6 +73,15 @@
             android:onClick="onClick"
             />
 
+        <Button
+            android:id="@+id/btn_d_close"
+            android:layout_marginTop="10dp"
+            android:layout_width="120dp"
+            android:layout_height="60dp"
+            android:text="Close Device"
+            android:onClick="onClick"
+            />
+
     </LinearLayout>
 
     <!--    <co.hoppen.cameralib.widget.UVCCameraTextureView-->

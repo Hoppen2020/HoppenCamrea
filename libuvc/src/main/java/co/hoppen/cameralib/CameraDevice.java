@@ -224,6 +224,7 @@ public class CameraDevice extends Device{
                     uvcCamera.setPreviewSize(width,height);
                     startPreview();
                     cameraConfig.setDevicePathName(usbDevice.getDeviceName());
+                    cameraConfig.setOpened(true);
                     if (cameraConfig.getOnDeviceListener()!=null){
                         String productName = "";
                         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
@@ -241,7 +242,7 @@ public class CameraDevice extends Device{
     void onDisconnect(UsbDevice usbDevice) {
         if (cameraConfig!=null){
             if (cameraConfig.getDevicePathName().equals(usbDevice.getDeviceName())){
-                if (cameraConfig.getOnDeviceListener()!=null){
+                if (cameraConfig.getOnDeviceListener()!=null && cameraConfig.isOpened()){
                     cameraConfig.getOnDeviceListener().onDisconnect();
                 }
                 closeDevice();
@@ -252,6 +253,7 @@ public class CameraDevice extends Device{
     @Override
     void closeDevice() {
         try {
+            if (cameraConfig!=null)cameraConfig.setOpened(false);
             LogUtils.e("cameraDevice closeDevice");
             if (uvcCamera != null) {
                 uvcCamera.destroy();

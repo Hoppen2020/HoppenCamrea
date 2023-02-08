@@ -150,7 +150,7 @@ public class HoppenCamera{
        private IButtonCallback cameraButtonListener;
        private String devicePathName = "";
        private NotifyListener notifyListener;
-
+       private boolean opened = false;
 
        public int getResolutionWidth() {
            return resolutionWidth;
@@ -202,6 +202,14 @@ public class HoppenCamera{
 
        public void setNotifyListener(NotifyListener notifyListener) {
            this.notifyListener = notifyListener;
+       }
+
+       public boolean isOpened() {
+           return opened;
+       }
+
+       public void setOpened(boolean opened) {
+           this.opened = opened;
        }
    }
 
