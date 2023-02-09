@@ -43,7 +43,9 @@ public class CameraDevice extends Device{
 
     private boolean capturing = false;
 
-//    private Boolean manualStopPreview = null;
+    private boolean reviewed = false;
+
+    private boolean surfaceDestroyed = false;
 
     public void setCameraConfig(HoppenCamera.CameraConfig cameraConfig) {
         this.cameraConfig = cameraConfig;
@@ -269,12 +271,13 @@ public class CameraDevice extends Device{
 
     public void startPreview(){
         try {
-//            if (manualStopPreview!=null && !manualStopPreview)return;
-//            if (manualStopPreview!=null)manualStopPreview = false;
             if (uvcCamera!=null && cameraConfig!=null){
+                LogUtils.e("startPreview ",reviewed);
+                if (surfaceDestroyed)return;
                 if (surface==null){
                     surface = new Surface(cameraConfig.getSurfaceTexture());
                 }
+                if (reviewed) return;
                 uvcCamera.setButtonCallback(cameraConfig.getCameraButtonListener());
                 uvcCamera.setPreviewDisplay(surface);
                 //****
@@ -295,6 +298,7 @@ public class CameraDevice extends Device{
                 },UVCCamera.PIXEL_FORMAT_YUV420SP);
                 uvcCamera.updateCameraParams();
                 uvcCamera.startPreview();
+                reviewed = true;
             }
         }catch (Exception e){
         }
@@ -302,14 +306,16 @@ public class CameraDevice extends Device{
 
     public void stopPreview(){
         try {
-//            if (manualStopPreview==null)manualStopPreview = true;
-            LogUtils.e("stopPreview");
+            LogUtils.e("stopPreview",reviewed);
+            if (!reviewed)return;
+            LogUtils.e("stop_now");
             if (mNV21DataQueue!=null){
                 mNV21DataQueue.clear();
             }
             if (uvcCamera!=null && cameraConfig!=null){
                 uvcCamera.setButtonCallback(null);
                 uvcCamera.stopPreview();
+                reviewed = false;
             }
         }catch (Exception e){
             LogUtils.e(e.toString());
@@ -321,6 +327,7 @@ public class CameraDevice extends Device{
         if (surface!=null){
             surface.release();
             surface = new Surface(surfaceTexture);
+            surfaceDestroyed = false;
             startPreview();
         }
     }
@@ -376,4 +383,11 @@ public class CameraDevice extends Device{
         });
     }
 
+    public boolean isSurfaceDestroyed() {
+        return surfaceDestroyed;
+    }
+
+    public void setSurfaceDestroyed() {
+        this.surfaceDestroyed = true;
+    }
 }

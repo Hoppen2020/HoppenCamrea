@@ -14,7 +14,7 @@ import com.hoppen.uvc.IButtonCallback;
 
 import java.lang.ref.WeakReference;
 
-import co.hoppen.cameralib.CallBack.NotifyListener;
+import co.hoppen.cameralib.CallBack.PageNotifyListener;
 import co.hoppen.cameralib.CallBack.OnDeviceListener;
 import co.hoppen.cameralib.CallBack.OnInfoListener;
 import co.hoppen.cameralib.CallBack.OnMoistureListener;
@@ -81,13 +81,19 @@ public class HoppenCamera{
 
           @Override
           public void onSurfaceTextureSizeChanged(SurfaceTexture surface, int width, int height) {
+            LogUtils.e("onSurfaceTextureSizeChanged");
           }
           @Override
           public boolean onSurfaceTextureDestroyed(SurfaceTexture surface) {
+              LogUtils.e("onSurfaceTextureDestroyed");
+              if (cameraConfig.getNotifyListener()!=null){
+                  cameraConfig.getNotifyListener().onSurfaceDestroyed();
+              }
               return false;
           }
           @Override
           public void onSurfaceTextureUpdated(SurfaceTexture surface) {
+//              LogUtils.e("onSurfaceTextureUpdated");
           }
       });
       return controller;
@@ -149,7 +155,7 @@ public class HoppenCamera{
        private OnInfoListener onInfoListener;
        private IButtonCallback cameraButtonListener;
        private String devicePathName = "";
-       private NotifyListener notifyListener;
+       private PageNotifyListener notifyListener;
        private boolean opened = false;
 
        public int getResolutionWidth() {
@@ -196,11 +202,11 @@ public class HoppenCamera{
            this.devicePathName = devicePathName;
        }
 
-       public NotifyListener getNotifyListener() {
+       public PageNotifyListener getNotifyListener() {
            return notifyListener;
        }
 
-       public void setNotifyListener(NotifyListener notifyListener) {
+       public void setNotifyListener(PageNotifyListener notifyListener) {
            this.notifyListener = notifyListener;
        }
 
