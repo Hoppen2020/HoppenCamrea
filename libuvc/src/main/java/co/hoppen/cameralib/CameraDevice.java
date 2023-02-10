@@ -64,7 +64,7 @@ public class CameraDevice extends Device{
         //异步发送指令
         if (uvcCamera!=null && instruction!=null &&cameraConfig!=null){
             if (!deviceConfig.isMcuCommunication()){
-                ThreadUtils.executeByFixed(5, new ThreadUtils.SimpleTask<Map<Instruction, Object>>() {
+                ThreadUtils.executeBySingle( new ThreadUtils.SimpleTask<Map<Instruction, Object>>() {
                     @Override
                     public Map<Instruction, Object> doInBackground() throws Throwable {
                          Map<Instruction, Object> resultMap= new HashMap<>();
@@ -256,7 +256,7 @@ public class CameraDevice extends Device{
     void closeDevice() {
         try {
             if (cameraConfig!=null)cameraConfig.setOpened(false);
-            LogUtils.e("cameraDevice closeDevice");
+//            LogUtils.e("cameraDevice closeDevice");
             if (uvcCamera != null) {
                 uvcCamera.destroy();
                 uvcCamera = null;

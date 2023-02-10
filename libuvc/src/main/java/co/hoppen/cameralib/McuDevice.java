@@ -7,9 +7,11 @@ import com.blankj.utilcode.util.LogUtils;
 import com.blankj.utilcode.util.ThreadUtils;
 
 import java.util.Arrays;
+import java.util.concurrent.Executor;
+import java.util.concurrent.Executors;
+import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
 
-import co.hoppen.cameralib.CallBack.OnMoistureListener;
 import co.hoppen.cameralib.tools.queue.ConnectMcuDeviceTask;
 import co.hoppen.cameralib.tools.queue.TaskQueue;
 
@@ -23,42 +25,40 @@ import static co.hoppen.cameralib.CompatibleMode.MODE_SINGLE;
 public class McuDevice extends Device{
    private final static int DEFAULT_MAX_READ_BYTES = 128;
    private final static int DEFAULT_TIMEOUT = 300;
-   private TaskQueue taskQueue = new TaskQueue();
+   private final TaskQueue taskQueue = new TaskQueue();
    private ConnectMcuDeviceTask.ConnectMcuInfo connectMcuInfo;
    private Thread readDataThread;
-   private OnMoistureListener onMoistureListener;
+   private final HoppenCamera.CameraConfig cameraConfig;
+   private final ScheduledExecutorService executorService = Executors.newSingleThreadScheduledExecutor();
 
-   private ThreadUtils.Task autoSystemOnlineTask = new ThreadUtils.SimpleTask<Object>() {
+   private final Runnable systemOnlineRunnable = new Runnable() {
       @Override
-      public Object doInBackground() throws Throwable {
-//         LogUtils.e("autoSystemOnlineTask");
-         sendInstruction(UsbInstructionUtils.USB_CAMERA_SYS_ONLINE());
-         return null;
-      }
-      @Override
-      public void onSuccess(Object result) {
+      public void run() {
+         if (connectMcuInfo!=null && connectMcuInfo.getUsbDeviceConnection()!=null){
+            sendInstruction(UsbInstructionUtils.USB_CAMERA_SYS_ONLINE());
+         }else throw new RuntimeException();
       }
    };
-
-   private Runnable readRunnable = new Runnable() {
+   private final Runnable readRunnable = new Runnable() {
       @Override
       public void run() {
          while (connectMcuInfo!=null && connectMcuInfo.getUsbDeviceConnection()!=null){
             try {
                byte[] bytes = readData();
                if (bytes!=null){
-                  ThreadUtils.executeByFixed(5, new ThreadUtils.SimpleTask<Float>() {
+                  String data = decodingData(bytes);
+                  float result = decodingMoisture(data);
+                  ThreadUtils.executeBySingle(new ThreadUtils.SimpleTask<Float>() {
                      @Override
                      public Float doInBackground() throws Throwable {
-                        String data = decodingData(bytes);
-                        return decodingMoisture(data);
+                        return result;
                      }
 
                      @Override
                      public void onSuccess(Float result) {
-                        if (onMoistureListener!=null){
-                           if (result>=0){
-                              onMoistureListener.onMoistureCallBack(result);
+                        if (result>=0){
+                           if (cameraConfig.getOnMoistureListener()!=null){
+                              cameraConfig.getOnMoistureListener().onMoistureCallBack(result);
                            }
                         }
                      }
@@ -71,13 +71,12 @@ public class McuDevice extends Device{
    };
 
 
-   public McuDevice(OnMoistureListener onMoistureListener){
-      this.onMoistureListener = onMoistureListener;
+   public McuDevice(HoppenCamera.CameraConfig cameraConfig){
+      this.cameraConfig = cameraConfig;
    }
 
    @Override
    void onConnecting(UsbDevice usbDevice) {
-      if (taskQueue!=null){
          taskQueue.addTask(new ConnectMcuDeviceTask(usbDevice), new TaskQueue.CurrentTaskFinish<ConnectMcuDeviceTask>() {
             @Override
             public void onFinish(ConnectMcuDeviceTask task) {
@@ -85,15 +84,14 @@ public class McuDevice extends Device{
                if (connectMcuInfo.isConform()){
                   McuDevice.this.connectMcuInfo = connectMcuInfo;
                   LogUtils.e(connectMcuInfo.getCompatibleMode());
-                  if (connectMcuInfo.getCompatibleMode()== MODE_AUTO){
-                     ThreadUtils.executeByFixedAtFixRate(1, autoSystemOnlineTask, 5, 30, TimeUnit.SECONDS);
+                  if (connectMcuInfo.getCompatibleMode() == MODE_AUTO){
+                     executorService.scheduleAtFixedRate(systemOnlineRunnable,0,5,TimeUnit.SECONDS);
                   }
                   readDataThread = new Thread(readRunnable);
                   readDataThread.start();
                }
             }
          });
-      }
    }
 
    private byte[] readData(){
@@ -189,7 +187,7 @@ public class McuDevice extends Device{
             @Override
             public void onSuccess(Integer result) {
                if (result==-1){
-                  if (onMoistureListener!=null)onMoistureListener.onMoistureCallBack(result);
+                  if (cameraConfig.getOnMoistureListener()!=null)cameraConfig.getOnMoistureListener().onMoistureCallBack(result);
                }
             }
          });
@@ -215,9 +213,8 @@ public class McuDevice extends Device{
    void closeDevice() {
       if (connectMcuInfo != null) {
          try {
-            if (autoSystemOnlineTask!=null){
-               ThreadUtils.cancel(autoSystemOnlineTask);
-            }
+//            taskQueue.cancel();
+//            ThreadUtils.cancel(autoSystemOnlineTask);
             UsbDeviceConnection usbDeviceConnection = connectMcuInfo.getUsbDeviceConnection();
             usbDeviceConnection.releaseInterface(connectMcuInfo.getUsbInterface());
             usbDeviceConnection.close();

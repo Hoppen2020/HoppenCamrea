@@ -1,52 +1,48 @@
 package co.hoppen.cameralib;
 
+import android.content.Context;
 import android.graphics.SurfaceTexture;
 import android.hardware.usb.UsbDevice;
+import android.view.TextureView;
+
+import androidx.annotation.NonNull;
+import androidx.lifecycle.Lifecycle;
+import androidx.lifecycle.LifecycleEventObserver;
+import androidx.lifecycle.LifecycleOwner;
 
 import com.blankj.utilcode.util.LogUtils;
 
+import java.lang.ref.WeakReference;
+
 import co.hoppen.cameralib.CallBack.CaptureCallback;
 import co.hoppen.cameralib.CallBack.ControllerFunction;
-import co.hoppen.cameralib.CallBack.PageNotifyListener;
 import co.hoppen.cameralib.CallBack.OnUsbStatusListener;
+import co.hoppen.cameralib.widget.UVCCameraTextureView;
 
 /**
  * Created by YangJianHui on 2022/9/28.
  */
-public class HoppenController implements ControllerFunction, OnUsbStatusListener{
-   private CameraDevice cameraDevice = new CameraDevice();
+public class HoppenController implements ControllerFunction, OnUsbStatusListener, TextureView.SurfaceTextureListener,LifecycleEventObserver {
+   private final CameraDevice cameraDevice = new CameraDevice();
    private McuDevice mcuDevice;
 
+   private UsbMonitor usbMonitor;
+
+   private HoppenCamera.CameraConfig cameraConfig;
+
+   private WeakReference<Context> contextWeakReference;
+
    public HoppenController(HoppenCamera.CameraConfig cameraConfig){
+      this.cameraConfig = cameraConfig;
       cameraDevice.setCameraConfig(cameraConfig);
-      mcuDevice= new McuDevice(cameraConfig.getOnMoistureListener());
-      cameraConfig.setNotifyListener(new PageNotifyListener() {
-         @Override
-         public void onUpdateSurface(SurfaceTexture surfaceTexture) {
-            cameraDevice.updateSurface(surfaceTexture);
-         }
-
-         @Override
-         public void onSurfaceDestroyed() {
-            cameraDevice.setSurfaceDestroyed();
-         }
-
-         @Override
-         public void onPageResume() {
-            startPreview();
-         }
-
-         @Override
-         public void onPageStop() {
-            stopPreview();
-         }
-
-         @Override
-         public void onPageDestroy() {
-            LogUtils.e("onPageDestroy");
-            closeDevices();
-         }
-      });
+      mcuDevice= new McuDevice(cameraConfig);
+      try {
+         UVCCameraTextureView textureView = cameraConfig.getTextureView();
+         contextWeakReference = new WeakReference<>(textureView.getContext());
+         textureView.setSurfaceTextureListener(this);
+      }catch (Exception e){
+         LogUtils.e(e.toString());
+      }
    }
 
    @Override
@@ -208,4 +204,59 @@ public class HoppenController implements ControllerFunction, OnUsbStatusListener
       cameraDevice.sendInstruction(instruction);
       mcuDevice.sendInstruction(instruction);
    }
+
+   @Override
+   public void onStateChanged(@NonNull LifecycleOwner source, @NonNull Lifecycle.Event event) {
+      if (event.equals(Lifecycle.Event.ON_CREATE)){
+         usbMonitor.connectListDevice(contextWeakReference.get());
+      }else if (event.equals(Lifecycle.Event.ON_START)){
+         usbMonitor.register(contextWeakReference.get());
+      }else if (event.equals(Lifecycle.Event.ON_RESUME)){
+         startPreview();
+      } else if (event.equals(Lifecycle.Event.ON_STOP)){
+         LogUtils.e(contextWeakReference.get()!=null);
+         usbMonitor.unregister(contextWeakReference.get());
+         stopPreview();
+      }else if (event.equals(Lifecycle.Event.ON_DESTROY)){
+         closeDevices();
+      }
+   }
+
+
+   //------------------SurfaceTextureListener---------------------
+   @Override
+   public void onSurfaceTextureAvailable(SurfaceTexture surfaceTexture, int i, int i1) {
+              if (cameraConfig.getSurfaceTexture()==null){
+                  cameraConfig.setSurfaceTexture(surfaceTexture);
+              }else {
+                 cameraConfig.setSurfaceTexture(surfaceTexture);
+                 cameraDevice.updateSurface(surfaceTexture);
+              }
+              if (usbMonitor==null){
+                 usbMonitor = new UsbMonitor(this);
+                 if (contextWeakReference!=null&&contextWeakReference.get()!=null){
+                    ((LifecycleOwner)contextWeakReference.get())
+                            .getLifecycle()
+                            .addObserver(this);
+                 }
+              }
+   }
+
+   @Override
+   public void onSurfaceTextureSizeChanged(SurfaceTexture surfaceTexture, int i, int i1) {
+
+   }
+
+   @Override
+   public boolean onSurfaceTextureDestroyed(SurfaceTexture surfaceTexture) {
+      cameraDevice.setSurfaceDestroyed();
+      return false;
+   }
+
+   @Override
+   public void onSurfaceTextureUpdated(SurfaceTexture surfaceTexture) {
+
+   }
+
+
 }
