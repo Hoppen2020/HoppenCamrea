@@ -262,6 +262,8 @@ public class CameraDevice extends Device{
                 uvcCamera = null;
                 surface.release();
                 surface=null;
+                reviewed = false;
+//                surfaceDestroyed = false;
             }
         } catch (Exception e) {
             LogUtils.e(e.toString());
@@ -272,7 +274,7 @@ public class CameraDevice extends Device{
     public void startPreview(){
         try {
             if (uvcCamera!=null && cameraConfig!=null){
-                LogUtils.e("startPreview ",reviewed);
+                LogUtils.e("startPreview ",reviewed,surfaceDestroyed);
                 if (surfaceDestroyed)return;
                 if (surface==null){
                     surface = new Surface(cameraConfig.getSurfaceTexture());
