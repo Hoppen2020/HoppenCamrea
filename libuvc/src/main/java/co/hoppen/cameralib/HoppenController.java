@@ -233,11 +233,9 @@ public class HoppenController implements ControllerFunction, OnUsbStatusListener
                  cameraDevice.updateSurface(surfaceTexture);
               }
               if (usbMonitor==null){
-                 usbMonitor = new UsbMonitor(this);
-                 if (contextWeakReference!=null&&contextWeakReference.get()!=null){
-                    ((LifecycleOwner)contextWeakReference.get())
-                            .getLifecycle()
-                            .addObserver(this);
+                 usbMonitor = new UsbMonitor(this,cameraConfig.getCameraFilter());
+                 if (contextWeakReference!=null && contextWeakReference.get()!=null){
+                    ((LifecycleOwner)contextWeakReference.get()).getLifecycle().addObserver(this);
                  }
               }
    }

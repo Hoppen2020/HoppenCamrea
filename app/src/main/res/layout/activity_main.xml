@@ -24,5 +24,12 @@
         android:onClick="face"
         />
 
+    <co.hoppen.cameralib.widget.UVCCameraTextureView
+        android:id="@+id/tv_camera"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:visibility="gone"
+        />
+
 
 </LinearLayout>

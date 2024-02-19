@@ -66,20 +66,22 @@ public final class DeviceFilter {
 
 	public DeviceType type = DeviceType.UNKNOWN;
 
+	public DetectType detectType = DetectType.NONE;
+
 //	public int deviceType = DeviceType.DEVICE_TYPE_UNKNOW;
 
 	public DeviceFilter(final int vid, final int pid, final int clasz, final int subclass,
-                        final int protocol, final String manufacturer, final String product, final String serialNum , final DeviceType type) {
-		this(vid, pid, clasz, subclass, protocol, manufacturer, product, serialNum, false,type);
+                        final int protocol, final String manufacturer, final String product, final String serialNum , final DeviceType type,final DetectType detectType) {
+		this(vid, pid, clasz, subclass, protocol, manufacturer, product, serialNum, false,type,detectType);
 	}
 
-	public DeviceFilter(final int vid,final int pid,final DeviceType type){
-		this(vid, pid, -1, -1, -1, null, null, null, false,type);
+	public DeviceFilter(final int vid,final int pid,final DeviceType type,final DetectType detectType){
+		this(vid, pid, -1, -1, -1, null, null, null, false,type,detectType);
 	}
 
 	public DeviceFilter(final int vid, final int pid, final int clasz, final int subclass,
                         final int protocol, final String manufacturer, final String product, final String serialNum, final boolean isExclude ,
-                        final DeviceType type
+                        final DeviceType type,final DetectType detectType
 						) {
 		mVendorId = vid;
 		mProductId = pid;
@@ -91,6 +93,7 @@ public final class DeviceFilter {
 		mSerialNumber = serialNum;
 		this.isExclude = isExclude;
 		this.type = type;
+		this.detectType = detectType;
 
 		/*		Log.i(TAG, String.format("vendorId=0x%04x,productId=0x%04x,class=0x%02x,subclass=0x%02x,protocol=0x%02x",
 			mVendorId, mProductId, mClass, mSubclass, mProtocol)); */
@@ -273,6 +276,7 @@ public final class DeviceFilter {
 		String serialNumber = null;
 		boolean hasValue = false;
 		int type = -1;
+		int detectType = 0;
 
 		String tag;
         int eventType = parser.getEventType();
@@ -304,12 +308,13 @@ public final class DeviceFilter {
             			serialNumber = getAttributeString(context, parser, null, "serial", null);
 					exclude = getAttributeBoolean(context, parser, null, "exclude", false);
 					type = getAttributeInteger(context, parser, null, "deviceType", DeviceType.getDeviceType(-1).getType());
+					detectType = getAttributeInteger(context, parser, null, "detectType", DetectType.getDetectType(0).getType());
 
 				} else if (eventType == XmlPullParser.END_TAG) {
         			if (hasValue) {
 	        			return new DeviceFilter(vendorId, productId, deviceClass,
 	        					deviceSubclass, deviceProtocol, manufacturerName, productName,
-	        					serialNumber, exclude,DeviceType.getDeviceType(type));
+	        					serialNumber, exclude,DeviceType.getDeviceType(type),DetectType.getDetectType(detectType));
         			}
         		}
         	}

@@ -19,6 +19,7 @@ import co.hoppen.cameralib.CallBack.CaptureCallback;
 import co.hoppen.cameralib.CallBack.OnDeviceListener;
 import co.hoppen.cameralib.CallBack.OnInfoListener;
 import co.hoppen.cameralib.CallBack.OnMoistureListener;
+import co.hoppen.cameralib.CameraFilter;
 import co.hoppen.cameralib.HoppenCamera;
 import co.hoppen.cameralib.HoppenController;
 import co.hoppen.cameralib.Instruction;
@@ -39,16 +40,23 @@ public class NewDeviceActivity extends AppCompatActivity implements OnMoistureLi
               .setCameraButtonListener(this)
               .setOnDeviceListener(this)
               .setOnInfoListener(this)
+              .setCameraFilter(CameraFilter.ONLY_HAIR_CAMERA)
               .setFrameFormat(UVCCamera.FRAME_FORMAT_MJPEG)
               .build();
-      findViewById(R.id.tv_status).setOnLongClickListener(new View.OnLongClickListener() {
-         @Override
-         public boolean onLongClick(View view) {
-            startActivity(new Intent(NewDeviceActivity.this,MainActivity.class));
-            finish();
-            return true;
-         }
+//      findViewById(R.id.tv_status).setOnLongClickListener(new View.OnLongClickListener() {
+//         @Override
+//         public boolean onLongClick(View view) {
+//            startActivity(new Intent(NewDeviceActivity.this,MainActivity.class));
+//            finish();
+//            return true;
+//         }
+//      });
+
+      findViewById(R.id.tv_status).setOnClickListener(view -> {
+         startActivity(new Intent(NewDeviceActivity.this,MainActivity.class));
+         finish();
       });
+
    }
 
    public void onClick(View view){

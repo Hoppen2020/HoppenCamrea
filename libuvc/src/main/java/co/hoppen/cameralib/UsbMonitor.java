@@ -16,6 +16,7 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 
 import co.hoppen.cameralib.CallBack.OnUsbStatusListener;
 
@@ -30,7 +31,10 @@ public class UsbMonitor{
     private OnUsbStatusListener onUsbStatusListener;
     private Map<String,UsbDevice> doubleCheckMap = new HashMap<>();//某些平板厂商需要用到doublecheck
 
-    public UsbMonitor(OnUsbStatusListener onUsbStatusListener){
+    private CameraFilter cameraFilter = CameraFilter.NORMAL;
+
+    public UsbMonitor(OnUsbStatusListener onUsbStatusListener,CameraFilter cameraFilter){
+        this.cameraFilter = cameraFilter;
         usbManager = (UsbManager) Utils.getApp().getSystemService(Context.USB_SERVICE);
         if (onUsbStatusListener!=null){
             this.onUsbStatusListener = onUsbStatusListener;
@@ -70,6 +74,7 @@ public class UsbMonitor{
             filter.addAction(USB_PERMISSION);
             context.registerReceiver(usbReceiver,filter);
         }
+
     }
 
     private void initUsbReceiver() {
@@ -169,12 +174,26 @@ public class UsbMonitor{
 
     private DeviceFilter deviceFilter(UsbDevice usbDevice){
         if (filterList==null) return null;
-        Iterator<DeviceFilter> iterator = filterList.iterator();
-        while (iterator.hasNext()){
-            DeviceFilter deviceFilter = iterator.next();
-            if (deviceFilter.mProductId ==usbDevice.getProductId()
-                    && deviceFilter.mVendorId ==usbDevice.getVendorId()){
-                return deviceFilter;
+        for (DeviceFilter deviceFilter : filterList) {
+            if (deviceFilter.mProductId == usbDevice.getProductId()
+                    && deviceFilter.mVendorId == usbDevice.getVendorId()) {
+                if (deviceFilter.detectType == DetectType.NONE) {
+                    return deviceFilter;
+                } else {
+                    if (cameraFilter == CameraFilter.ONLY_SKIN_CAMERA) {
+                        if (deviceFilter.detectType == DetectType.SKIN) {
+                            return deviceFilter;
+                        }
+                    } else if (cameraFilter == CameraFilter.ONLY_HAIR_CAMERA) {
+                        if (deviceFilter.detectType == DetectType.HAIR) {
+                            return deviceFilter;
+                        }
+                    } else if (cameraFilter == CameraFilter.ONLY_EYE_CAMERA) {
+                        if (deviceFilter.detectType == DetectType.EYE) {
+                            return deviceFilter;
+                        }
+                    } else return deviceFilter;
+                }
             }
         }
         return null;

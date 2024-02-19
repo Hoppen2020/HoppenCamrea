@@ -139,6 +139,11 @@ public class HoppenCamera{
          return this;
       }
 
+      public Builder setCameraFilter(CameraFilter cameraFilter){
+          cameraConfig.cameraFilter = cameraFilter;
+          return this;
+      }
+
       public HoppenController build(){
          return new HoppenCamera().createController(cameraConfig);
       }
@@ -157,6 +162,8 @@ public class HoppenCamera{
        private WeakReference<OnInfoListener> onInfoListener;
        private WeakReference<IButtonCallback> cameraButtonListener;
        private boolean opened = false;
+
+       private CameraFilter cameraFilter = CameraFilter.NORMAL;
 
        public int getResolutionWidth() {
            return resolutionWidth;
@@ -198,6 +205,10 @@ public class HoppenCamera{
            return devicePathName;
        }
 
+       public CameraFilter getCameraFilter() {
+           return cameraFilter;
+       }
+
        public void setDevicePathName(String devicePathName) {
            this.devicePathName = devicePathName;
        }
@@ -212,6 +223,10 @@ public class HoppenCamera{
 
        public void setSurfaceTexture(SurfaceTexture surfaceTexture) {
            this.surfaceTexture = surfaceTexture;
+       }
+
+       public void setCameraFilter(CameraFilter cameraFilter) {
+           this.cameraFilter = cameraFilter;
        }
 
        public void clear(){
