@@ -40,7 +40,6 @@ public class UsbMonitor{
             this.onUsbStatusListener = onUsbStatusListener;
             filterList = DeviceFilter.getDeviceFilters();
         }
-
     }
 
     public UsbMonitor(){
@@ -181,12 +180,16 @@ public class UsbMonitor{
                     return deviceFilter;
                 } else {
                     if (cameraFilter == CameraFilter.ONLY_SKIN_CAMERA) {
-                        if (deviceFilter.detectType == DetectType.SKIN) {
+                        if (deviceFilter.detectType == DetectType.SKIN && !DeviceConfig.getDeviceIsDetectHair(usbDevice.getProductName())) {
                             return deviceFilter;
                         }
                     } else if (cameraFilter == CameraFilter.ONLY_HAIR_CAMERA) {
                         if (deviceFilter.detectType == DetectType.HAIR) {
                             return deviceFilter;
+                        }else{
+                            if (DeviceConfig.getDeviceIsDetectHair(usbDevice.getProductName())){
+                                return deviceFilter;
+                            }
                         }
                     } else if (cameraFilter == CameraFilter.ONLY_EYE_CAMERA) {
                         if (deviceFilter.detectType == DetectType.EYE) {

@@ -30,6 +30,7 @@ import android.hardware.usb.UsbInterface;
 import android.text.TextUtils;
 import android.util.Log;
 
+import com.blankj.utilcode.util.LogUtils;
 import com.blankj.utilcode.util.Utils;
 import com.hoppen.uvccamera.R;
 
@@ -133,6 +134,7 @@ public final class DeviceFilter {
 	            if (eventType == XmlPullParser.START_TAG) {
 					final DeviceFilter deviceFilter = readEntryOne(Utils.getApp(), parser);
 					if (deviceFilter != null ) {//&& HoppenSDK.getInitStatus()== ErrorInfo.HP_OK
+						//LogUtils.e(deviceFilter.detectType);
 						deviceFilters.add(deviceFilter);
 					}
 	            }
@@ -310,6 +312,10 @@ public final class DeviceFilter {
 					type = getAttributeInteger(context, parser, null, "deviceType", DeviceType.getDeviceType(-1).getType());
 					detectType = getAttributeInteger(context, parser, null, "detectType", DetectType.getDetectType(0).getType());
 
+//					if (DeviceConfig.getDeviceIsDetectHair(productName)){
+//						detectType = DetectType.HAIR.getType();
+//					}
+//					LogUtils.e(detectType);
 				} else if (eventType == XmlPullParser.END_TAG) {
         			if (hasValue) {
 	        			return new DeviceFilter(vendorId, productId, deviceClass,

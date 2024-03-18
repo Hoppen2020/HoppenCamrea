@@ -10,6 +10,7 @@ public enum DeviceConfig {
    WAX_PF4D2_SX("WAX-PF4D2-SX",640,480,CommunicationType.INTERNAL_THREE_LIGHT),
    WAX_PF4D3_SX("WAX-PF4D3-SX",1280,960,CommunicationType.INTERNAL_THREE_LIGHT),
    WAX_PF4D4_SX("WAX_PF4D4_SX",1280,960,CommunicationType.INTERNAL_THREE_LIGHT),
+   WAX_PF3H1_SX("WAX-PF3H1-SX",1280,960,CommunicationType.INTERNAL_THREE_LIGHT),
    WAX_FACE_USB3("USB3.0",1920,1080,CommunicationType.INTERNAL_FIVE_LIGHT),
    WAX_DEFAULT("default",640,480,CommunicationType.MCU);
 
@@ -57,10 +58,20 @@ public enum DeviceConfig {
          return WAX_PF4D3_SX;
       }else if (deviceName.equals("WAX_PF4D4_SX")){
          return WAX_PF4D4_SX;
-      }else if (deviceName.equals("USB3.0")){
+      }else if (deviceName.equals("WAX-PF3H1-SX")){
+         return WAX_PF3H1_SX;
+      } else if (deviceName.equals("USB3.0")){
          return WAX_FACE_USB3;
       }else {
          return WAX_DEFAULT;
+      }
+   }
+
+   public static boolean getDeviceIsDetectHair(String name){
+      if (name==null){
+         return false;
+      }else{
+         return WAX_PF3H1_SX.getDeviceName().equals(name);
       }
    }
 
