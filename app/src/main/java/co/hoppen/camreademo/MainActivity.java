@@ -2,16 +2,11 @@ package co.hoppen.camreademo;
 
 import android.content.Intent;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.View;
-import android.widget.TextView;
 
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
-import androidx.appcompat.widget.AppCompatTextView;
 
-import ZtlApi.ZtlManager;
-import co.hoppen.cameralib.HoppenCamera;
 
 /**
  * Created by YangJianHui on 2022/10/11.
@@ -23,7 +18,6 @@ public class MainActivity extends AppCompatActivity {
    protected void onCreate(@Nullable Bundle savedInstanceState) {
       super.onCreate(savedInstanceState);
       setContentView(R.layout.activity_main);
-      ZtlManager.GetInstance().setContext(MainActivity.this);
    }
 
    public void newDevice(View view){

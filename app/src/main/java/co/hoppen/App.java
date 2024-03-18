@@ -2,8 +2,6 @@ package co.hoppen;
 
 import android.app.Application;
 
-import ZtlApi.ZtlManager;
-
 /**
  * Created by YangJianHui on 2022/2/26.
  */
