@@ -6,5 +6,6 @@ package co.hoppen.cameralib;
 public enum CommunicationType {
     MCU,
     INTERNAL_THREE_LIGHT,
-    INTERNAL_FIVE_LIGHT
+    INTERNAL_FIVE_LIGHT,
+    NONE
 }

@@ -114,6 +114,13 @@ public class HoppenController implements ControllerFunction, OnUsbStatusListener
       }else send(Instruction.MOISTURE);
    }
 
+   @Override
+   public void getMoisture(int tryCount) {
+      if (cameraDevice.getDeviceConfig()!=null && !cameraDevice.getDeviceConfig().isMcuCommunication()){
+         cameraDevice.sendInstruction(Instruction.MOISTURE);
+      }else send(Instruction.MOISTURE,tryCount);
+   }
+
    /**
     * 获取设备号
     */
@@ -135,6 +142,7 @@ public class HoppenController implements ControllerFunction, OnUsbStatusListener
     */
    @Override
    public void startPreview() {
+//      LogUtils.e("start 3");
       cameraDevice.startPreview();
    }
 
@@ -205,6 +213,11 @@ public class HoppenController implements ControllerFunction, OnUsbStatusListener
       mcuDevice.sendInstruction(instruction);
    }
 
+   private void send(Instruction instruction,int count){
+      cameraDevice.sendInstruction(instruction);
+      mcuDevice.sendInstruction(instruction,count);
+   }
+
    @Override
    public void onStateChanged(@NonNull LifecycleOwner source, @NonNull Lifecycle.Event event) {
       if (event.equals(Lifecycle.Event.ON_CREATE)){
@@ -214,7 +227,7 @@ public class HoppenController implements ControllerFunction, OnUsbStatusListener
       }else if (event.equals(Lifecycle.Event.ON_RESUME)){
          startPreview();
       } else if (event.equals(Lifecycle.Event.ON_STOP)){
-         LogUtils.e(contextWeakReference.get()!=null);
+         //LogUtils.e(contextWeakReference.get()!=null);
          usbMonitor.unregister(contextWeakReference.get());
          stopPreview();
       }else if (event.equals(Lifecycle.Event.ON_DESTROY)){
@@ -226,6 +239,7 @@ public class HoppenController implements ControllerFunction, OnUsbStatusListener
    //------------------SurfaceTextureListener---------------------
    @Override
    public void onSurfaceTextureAvailable(SurfaceTexture surfaceTexture, int i, int i1) {
+//      LogUtils.e("onSurfaceTextureAvailable");
               if (cameraConfig.getSurfaceTexture()==null){
                   cameraConfig.setSurfaceTexture(surfaceTexture);
               }else {
@@ -242,18 +256,19 @@ public class HoppenController implements ControllerFunction, OnUsbStatusListener
 
    @Override
    public void onSurfaceTextureSizeChanged(SurfaceTexture surfaceTexture, int i, int i1) {
-
+//      LogUtils.e("onSurfaceTextureSizeChanged");
    }
 
    @Override
    public boolean onSurfaceTextureDestroyed(SurfaceTexture surfaceTexture) {
+//      LogUtils.e("onSurfaceTextureDestroyed");
       cameraDevice.setSurfaceDestroyed();
       return false;
    }
 
    @Override
    public void onSurfaceTextureUpdated(SurfaceTexture surfaceTexture) {
-
+//      LogUtils.e("onSurfaceTextureUpdated");
    }
 
 

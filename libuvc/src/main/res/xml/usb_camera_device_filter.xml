@@ -7,6 +7,7 @@
     <!-- detectType 值：1 : skin -->
     <!-- detectType 值：2 : hair -->
     <!-- detectType 值：3 : eye -->
+    <!-- detectType 值：4 : function -->
 
     <usb-device vendorId="6790" productId="29987"  deviceType="1" detectType="0" />
     <usb-device vendorId="1423" productId="14433" deviceType = "2" detectType="1" />
@@ -19,6 +20,8 @@
     <usb-device vendorId="2760" productId="12310" deviceType = "2" detectType="2"/>
     <!-- 3d摄像头-->
     <usb-device vendorId="3804" productId="12416" deviceType = "2" detectType="1" />
+    <usb-device vendorId="3804" productId="32848" deviceType = "2" detectType="1" />
+
 
     <!-- 虹膜-->
     <usb-device vendorId="2425" productId="632" deviceType = "2" detectType="3" />
@@ -27,5 +30,10 @@
     <usb-device vendorId="1409" productId="5120" deviceType = "2" detectType="1" />
 
 <!--    <usb-device vendorId="3034" productId="33106" deviceType = "2" />-->
+
+    <!-- test 华为人脸识别camera-->
+<!--    <usb-device vendorId="3034" productId="12341" deviceType = "2" detectType="0"/>-->
+    <!-- test可视化camera -->
+    <usb-device vendorId="7119" productId="11157" deviceType = "2" detectType="4" />
 
 </usb>

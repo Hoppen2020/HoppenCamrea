@@ -2,6 +2,7 @@ package co.hoppen.cameralib;
 
 import android.content.Context;
 import android.graphics.SurfaceTexture;
+import android.os.Environment;
 import android.view.TextureView;
 
 import androidx.annotation.NonNull;
@@ -15,11 +16,13 @@ import com.hoppen.uvc.IButtonCallback;
 import java.lang.ref.WeakReference;
 
 import co.hoppen.cameralib.CallBack.OnDeviceListener;
+import co.hoppen.cameralib.CallBack.OnFrameListener;
 import co.hoppen.cameralib.CallBack.OnInfoListener;
 import co.hoppen.cameralib.CallBack.OnMoistureListener;
 import co.hoppen.cameralib.widget.UVCCameraTextureView;
 
 import static com.hoppen.uvc.UVCCamera.FRAME_FORMAT_MJPEG;
+import static com.hoppen.uvc.UVCCamera.PIXEL_FORMAT_YUV420SP;
 
 /**
  * Created by YangJianHui on 2022/9/27.
@@ -113,6 +116,11 @@ public class HoppenCamera{
           return this;
       }
 
+       public Builder setOnFrameListener(OnFrameListener onFrameListener){
+           cameraConfig.onFrameListener = new WeakReference<>(onFrameListener);
+           return this;
+       }
+
       public Builder setResolution(int width ,int height) {
          cameraConfig.resolutionWidth = width;
          cameraConfig.resolutionHeight = height;
@@ -129,6 +137,11 @@ public class HoppenCamera{
          return this;
       }
 
+       public Builder setPixelFormat(int pixelFormat) {
+           cameraConfig.pixelFormat = pixelFormat;
+           return this;
+       }
+
       public Builder setOnMoistureListener(OnMoistureListener onMoistureListener) {
          cameraConfig.onMoistureListener = new WeakReference<>(onMoistureListener);
          return this;
@@ -144,8 +157,22 @@ public class HoppenCamera{
           return this;
       }
 
+      public Builder setFaceLightCount(FaceLightCount faceLightCount){
+          cameraConfig.faceLightCount = faceLightCount;
+          return this;
+      }
+
+//      public Builder setDefaultPreview(boolean preview){
+//          cameraConfig.defaultPreview = preview;
+//          return this;
+//      }
+
       public HoppenController build(){
-         return new HoppenCamera().createController(cameraConfig);
+          //----------------test---------------------
+            //LogUtils.getConfig().setDir(Environment.getExternalStorageDirectory().getPath()).setLog2FileSwitch(true);
+          //----------------test---------------------
+         LogUtils.e("Controller Built");
+          return new HoppenCamera().createController(cameraConfig);
       }
 
    }
@@ -155,13 +182,17 @@ public class HoppenCamera{
        private int resolutionWidth;
        private int resolutionHeight;
        private int frameFormat = FRAME_FORMAT_MJPEG;
+       private int pixelFormat = PIXEL_FORMAT_YUV420SP;
        private String devicePathName = "";
        private WeakReference<UVCCameraTextureView> textureView;
        private WeakReference<OnDeviceListener> onDeviceListener;
        private WeakReference<OnMoistureListener> onMoistureListener;
        private WeakReference<OnInfoListener> onInfoListener;
        private WeakReference<IButtonCallback> cameraButtonListener;
+       private WeakReference<OnFrameListener> onFrameListener;
        private boolean opened = false;
+       private FaceLightCount faceLightCount = FaceLightCount.FIVE;
+//       private boolean defaultPreview = true;
 
        private CameraFilter cameraFilter = CameraFilter.NORMAL;
 
@@ -181,6 +212,10 @@ public class HoppenCamera{
            return frameFormat;
        }
 
+       public int getPixelFormat() {
+           return pixelFormat;
+       }
+
        public OnMoistureListener getOnMoistureListener() {
            return onMoistureListener!=null?onMoistureListener.get():null;
        }
@@ -195,6 +230,10 @@ public class HoppenCamera{
 
        public IButtonCallback getCameraButtonListener() {
            return cameraButtonListener!=null?cameraButtonListener.get():null;
+       }
+
+       public OnFrameListener getOnFrameListener() {
+           return onFrameListener!=null?onFrameListener.get():null;
        }
 
        public SurfaceTexture getSurfaceTexture() {
@@ -229,13 +268,28 @@ public class HoppenCamera{
            this.cameraFilter = cameraFilter;
        }
 
+       public FaceLightCount getFaceLightCount() {
+           return faceLightCount;
+       }
+
+//       public boolean isDefaultPreview() {
+//           return defaultPreview;
+//       }
+
        public void clear(){
            if (textureView!=null)textureView.clear();
            if (onDeviceListener!=null)onDeviceListener.clear();
            if (onMoistureListener!=null)onMoistureListener.clear();
            if (onInfoListener!=null)onInfoListener.clear();
            if (cameraButtonListener!=null)cameraButtonListener.clear();
+           if (onFrameListener!=null)onFrameListener.clear();
        }
+
+   }
+
+   public enum FaceLightCount{
+       FIVE,
+       THREE
    }
 
 }

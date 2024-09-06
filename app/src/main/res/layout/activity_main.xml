@@ -24,6 +24,24 @@
         android:onClick="face"
         />
 
+    <androidx.appcompat.widget.AppCompatButton
+        android:layout_marginTop="30dp"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="DETECT FACE DEMO"
+        android:textSize="20sp"
+        android:onClick="detect"
+        />
+
+    <androidx.appcompat.widget.AppCompatButton
+        android:layout_marginTop="30dp"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="ZOOM CAMERA DEMO"
+        android:textSize="20sp"
+        android:onClick="zoom"
+        />
+
 
     <co.hoppen.cameralib.widget.UVCCameraTextureView
         android:id="@+id/tv_camera"

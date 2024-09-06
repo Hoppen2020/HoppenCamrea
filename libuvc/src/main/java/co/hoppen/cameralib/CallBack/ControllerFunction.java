@@ -24,6 +24,8 @@ public interface ControllerFunction {
 
     void getMoisture();
 
+    void getMoisture(int tryCount);
+
     void getProductCode();
 
     void getUniqueCode();

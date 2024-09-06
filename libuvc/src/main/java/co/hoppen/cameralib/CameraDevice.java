@@ -15,6 +15,7 @@ import com.hoppen.uvc.IFrameCallback;
 import com.hoppen.uvc.UVCCamera;
 
 import java.nio.ByteBuffer;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.LinkedBlockingDeque;
@@ -79,19 +80,23 @@ public class CameraDevice extends Device{
                                 pdat[2] = 0;
                                 pdat[3] = 0;
                                 if (instruction== MOISTURE){
-                                    pdat[0] = 0x1;    // 0 for write, 1 for read
-                                    pdat[1] = 0x78;
-                                    pdat[2] = 0x79;
-                                    uvcCamera.jXuWrite(writeCmd, writeAddr, pdat.length, pdat);
-                                    uvcCamera.jXuRead(readCmd, readAddr, pdat.length, pdat);
-                                    int a = pdat[0];
-                                    int b = pdat[1];
-                                    int c = pdat[2];
-                                    int d = a^b;
-                                    if (c == d){
-                                        float water = Float.parseFloat(a+ "." + b);
-                                        if (water >= 0) {
-                                            resultMap.put(instruction,water);
+                                    if (DeviceConfig.isNoneMoisture(deviceConfig)){
+                                        resultMap.put(instruction,-1f);
+                                    }else {
+                                        pdat[0] = 0x1;    // 0 for write, 1 for read
+                                        pdat[1] = 0x78;
+                                        pdat[2] = 0x79;
+                                        uvcCamera.jXuWrite(writeCmd, writeAddr, pdat.length, pdat);
+                                        uvcCamera.jXuRead(readCmd, readAddr, pdat.length, pdat);
+                                        int a = pdat[0];
+                                        int b = pdat[1];
+                                        int c = pdat[2];
+                                        int d = a^b;
+                                        if (c == d){
+                                            float water = Float.parseFloat(a+ "." + b);
+                                            if (water >= 0) {
+                                                resultMap.put(instruction,water);
+                                            }
                                         }
                                     }
                                 }else if (instruction==UNIQUE_CODE){
@@ -130,6 +135,9 @@ public class CameraDevice extends Device{
                                             pdat = null;
                                             break;
                                     }
+                                    //-----------------------------------------
+
+                                    //-----------------------------------------
                                     if (pdat!=null){
                                         uvcCamera.jXuWrite(writeCmd, writeAddr, pdat.length, pdat);
                                     }
@@ -137,45 +145,70 @@ public class CameraDevice extends Device{
                             }else if (deviceConfig.getCommunicationType()==CommunicationType.INTERNAL_FIVE_LIGHT){
                                 int writeCmd = 0x82;
                                 int readCmd = 0xc2;
-                                int writeAddr = 0xd816;
-                                int readAddr = 0xd817;
+                                int writeAddr = cameraConfig.getFaceLightCount()== HoppenCamera.FaceLightCount.FIVE?0xd816:0xc7b2; //0xd816;//0xd816;//五光谱：0xd816 //三光谱：0xc7b2
+                                int readAddr = cameraConfig.getFaceLightCount()== HoppenCamera.FaceLightCount.FIVE?0xd817:0xc7b3;//0xd817; //三光谱：0xc7b3
                                 int send = -1;
                                 byte[] pdat = new byte[4];
                                 pdat[0] = 0x0;    // 0 for write, 1 for read
                                 pdat[1] = 0x78;    // slave id (same for read and write)
                                 pdat[2] = 0;
                                 pdat[3] = 0;
-                                switch (instruction) {
-                                    case LIGHT_CLOSE:
-                                        pdat[2] = 0x10;
-                                        pdat[3] = 0x00;
-                                        break;
-                                    case LIGHT_UV://4
-                                        pdat[2] = 0x14;//0x11
-                                        pdat[3] = (byte) 0xff;
-                                        break;
-                                    case LIGHT_RGB://2
-                                        pdat[2] = 0x10;//0x10
-                                        pdat[3] = (byte) 0xff;
-                                        break;
-                                    case LIGHT_POLARIZED://3
-                                        pdat[2] = 0x12;
-                                        pdat[3] = (byte) 0xff;
-                                        break;
-                                    case LIGHT_BALANCED_POLARIZED:
-                                        pdat[2] = 0x13;
-                                        pdat[3] = (byte) 0xff;
-                                        break;
-                                    case LIGHT_WOOD:
-                                        pdat[2] = 0x11;//
-                                        pdat[3] = (byte) 0xff;
-                                        break;
-                                    default:
-                                        pdat =null;
-                                        break;
-                                }
-                                if (pdat!=null){
-                                    uvcCamera.jXuWrite(writeCmd, writeAddr, pdat.length, pdat);
+                                LogUtils.e(instruction);
+
+                                if (instruction==MOISTURE){
+                                    //-----------------------------test
+                                    {
+                                        pdat[0] = 0x1;    // 0 for write, 1 for read
+                                        pdat[1] = 0x78;
+                                        pdat[2] = 0x79;
+                                        uvcCamera.jXuWrite(writeCmd, writeAddr, pdat.length, pdat);
+                                        uvcCamera.jXuRead(readCmd, readAddr, pdat.length, pdat);
+                                        int a = pdat[0];
+                                        int b = pdat[1];
+                                        int c = pdat[2];
+                                        int d = a^b;
+                                        if (c == d){
+                                            float water = Float.parseFloat(a+ "." + b);
+                                            if (water >= 0) {
+                                                resultMap.put(instruction,water);
+                                            }
+                                        }
+                                    }
+                                    //-----------------------------test
+                                }else {
+                                    switch (instruction) {
+                                        case LIGHT_CLOSE:
+                                            pdat[2] = 0x10;
+                                            pdat[3] = 0x00;
+                                            break;
+                                        case LIGHT_UV://4
+                                            pdat[2] = (byte) (cameraConfig.getFaceLightCount() == HoppenCamera.FaceLightCount.FIVE? 0x14 : 0x13);//0x14
+                                            pdat[3] = (byte) 0xff;
+                                            break;
+                                        case LIGHT_RGB://2
+                                            pdat[2] = (byte) (cameraConfig.getFaceLightCount()== HoppenCamera.FaceLightCount.FIVE?0x10:0x11);//0x10;//0x10
+                                            pdat[3] = (byte) 0xff;
+                                            break;
+                                        case LIGHT_POLARIZED://3
+                                            pdat[2] = 0x12;
+                                            pdat[3] = (byte) 0xff;
+                                            break;
+                                        case LIGHT_BALANCED_POLARIZED:
+                                            pdat[2] = 0x13;
+                                            pdat[3] = (byte) 0xff;
+                                            break;
+                                        case LIGHT_WOOD:
+                                            pdat[2] = 0x11;//
+                                            pdat[3] = (byte) 0xff;
+                                            break;
+                                        default:
+                                            pdat =null;
+                                            break;
+                                    }
+                                    if (pdat!=null){
+//                                        LogUtils.e(Arrays.toString(pdat));
+                                        uvcCamera.jXuWrite(writeCmd, writeAddr, pdat.length, pdat);
+                                    }
                                 }
                             }
                             return resultMap;
@@ -224,6 +257,7 @@ public class CameraDevice extends Device{
                         height = cameraConfig.getResolutionHeight();
                     }
                     uvcCamera.setPreviewSize(width,height);
+                    LogUtils.e("start 1");
                     startPreview();
                     cameraConfig.setDevicePathName(usbDevice.getDeviceName());
                     cameraConfig.setOpened(true);
@@ -286,7 +320,11 @@ public class CameraDevice extends Device{
                 uvcCamera.setFrameCallback(new IFrameCallback() {
                     @Override
                     public void onFrame(ByteBuffer frame) {
+                        //LogUtils.e(Arrays.toString(frame.array()));
                         if (frame!=null){
+                            if (cameraConfig.getOnFrameListener()!=null){
+                                cameraConfig.getOnFrameListener().onFrame(frame);
+                            }
                             byte[] data = new byte[frame.capacity()];
                             frame.get(data);
                             if (mNV21DataQueue!=null){
@@ -297,7 +335,7 @@ public class CameraDevice extends Device{
                             }
                         }
                     }
-                },UVCCamera.PIXEL_FORMAT_YUV420SP);
+                },cameraConfig.getPixelFormat());//UVCCamera.PIXEL_FORMAT_YUV420SP
                 uvcCamera.updateCameraParams();
                 uvcCamera.startPreview();
                 reviewed = true;
@@ -330,6 +368,7 @@ public class CameraDevice extends Device{
             surface.release();
             surface = new Surface(surfaceTexture);
             surfaceDestroyed = false;
+//            LogUtils.e("start 2");
             startPreview();
         }
     }

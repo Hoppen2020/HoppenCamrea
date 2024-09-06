@@ -31,7 +31,9 @@
 
         <activity android:name=".NewDeviceActivity" android:screenOrientation="sensorLandscape" />
 
+        <activity android:name=".DetectActivity" android:screenOrientation="sensorLandscape" />
 
+        <activity android:name=".ZoomActivity" android:screenOrientation="sensorLandscape" />
     </application>
 
 </manifest>

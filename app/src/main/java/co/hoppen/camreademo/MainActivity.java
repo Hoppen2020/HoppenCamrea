@@ -2,6 +2,7 @@ package co.hoppen.camreademo;
 
 import android.content.Intent;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.View;
 
 import androidx.annotation.Nullable;
@@ -27,6 +28,16 @@ public class MainActivity extends AppCompatActivity {
 
    public void face(View view){
       startActivity(new Intent(this,FaceActivity.class));
+      finish();
+   }
+
+   public void detect(View view){
+      startActivity(new Intent(this,DetectActivity.class));
+      finish();
+   }
+
+   public void zoom(View view){
+      startActivity(new Intent(this,ZoomActivity.class));
       finish();
    }
 

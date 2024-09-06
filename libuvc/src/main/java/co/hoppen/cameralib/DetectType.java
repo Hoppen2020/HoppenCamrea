@@ -7,7 +7,8 @@ public enum DetectType {
     NONE(0),
     SKIN(1),
     HAIR(2),
-    EYE(3);
+    EYE(3),
+    FUNCTION(4);
 
     private final int type;
 
@@ -26,6 +27,8 @@ public enum DetectType {
             return HAIR;
         }else if (type == 3){
             return EYE;
+        }else if (type == 4){
+            return FUNCTION;
         }else return NONE;
     }
 

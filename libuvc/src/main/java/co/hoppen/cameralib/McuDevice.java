@@ -47,7 +47,9 @@ public class McuDevice extends Device{
                byte[] bytes = readData();
                if (bytes!=null){
                   String data = decodingData(bytes);
+                  //LogUtils.e(data);
                   float result = decodingMoisture(data);
+                  //LogUtils.e(result);
                   ThreadUtils.executeBySingle(new ThreadUtils.SimpleTask<Float>() {
                      @Override
                      public Float doInBackground() throws Throwable {
@@ -58,6 +60,7 @@ public class McuDevice extends Device{
                      public void onSuccess(Float result) {
                         if (result>=0){
                            if (cameraConfig.getOnMoistureListener()!=null){
+                              //LogUtils.e(result);
                               cameraConfig.getOnMoistureListener().onMoistureCallBack(result);
                            }
                         }
@@ -124,7 +127,12 @@ public class McuDevice extends Device{
    private float decodingMoisture(String data){
       float fail = -1;
       try {
-         fail = Float.parseFloat(data.replace("-", "."));
+         if (data.contains("-")){
+            int index = data.indexOf("-");
+            //部分机器粘包问题，处理兼容
+            data = data.substring(index-2,index+3);
+            fail = Float.parseFloat(data.replace("-", "."));
+         }
       }catch (Exception e){
       }
       return fail;
@@ -142,56 +150,75 @@ public class McuDevice extends Device{
 
    @Override
    void sendInstruction(Instruction instruction) {
-         //异步发送
-         ThreadUtils.executeByFixed(5, new ThreadUtils.SimpleTask<Integer>() {
-            @Override
-            public Integer doInBackground() throws Throwable {
-                  CompatibleMode currentMode = connectMcuInfo==null||connectMcuInfo.getCompatibleMode()==null?MODE_NONE:connectMcuInfo.getCompatibleMode();
-                  //LogUtils.e("currentMode" + currentMode);
-                  if ((currentMode==MODE_NONE || currentMode==MODE_SINGLE)
-                          &&
-                          instruction != Instruction.MOISTURE) return 0;
-                  if (currentMode==MODE_NONE && instruction == Instruction.MOISTURE){
-                     return -1;
-                  }
-                  byte [] bytes = null;
-                  switch (instruction){
-                     case LIGHT_CLOSE:
-                        bytes = UsbInstructionUtils.USB_CAMERA_LIGHT_CLOSE();
-                        break;
-                     case LIGHT_UV:
-                        bytes = UsbInstructionUtils.USB_CAMERA_LIGHT_UV();
-                        break;
-                     case LIGHT_RGB:
-                        bytes = UsbInstructionUtils.USB_CAMERA_LIGHT_RGB();
-                        break;
-                     case LIGHT_POLARIZED:
-                        bytes = UsbInstructionUtils.USB_CAMERA_LIGHT_POLARIZED();
-                        break;
-                     case PRODUCT_CODE:
-                        bytes = UsbInstructionUtils.USB_CAMERA_PRODUCT_CODE();
-                        break;
-                     case SYS_ONLINE:
-                        bytes = UsbInstructionUtils.USB_CAMERA_SYS_ONLINE();
-                        break;
-                     case MOISTURE:
-                        bytes = currentMode==MODE_AUTO?
-                                UsbInstructionUtils.USB_CAMERA_WATER():
-                                UsbInstructionUtils.USB_CAMERA_WATER_SINGLE_MODE();
-                        break;
-                  }
-                  sendInstruction(bytes);
-               return 0;
+      sendInstruction(instruction,0);
+   }
+
+   public void sendInstruction(Instruction instruction,int count){
+      //异步发送
+      ThreadUtils.executeByFixed(5, new ThreadUtils.SimpleTask<Integer>() {
+         @Override
+         public Integer doInBackground() throws Throwable {
+            CompatibleMode currentMode = connectMcuInfo==null||
+                    connectMcuInfo.getCompatibleMode()==null?MODE_NONE:connectMcuInfo.getCompatibleMode();
+            LogUtils.e("currentMode" + currentMode , count);
+            if ((currentMode==MODE_NONE || currentMode==MODE_SINGLE)
+                    &&
+                    instruction != Instruction.MOISTURE) return 0;
+            if (currentMode==MODE_NONE && instruction == Instruction.MOISTURE){
+               return -1;
+            }
+            byte [] bytes = null;
+            switch (instruction){
+               case LIGHT_CLOSE:
+                  bytes = UsbInstructionUtils.USB_CAMERA_LIGHT_CLOSE();
+                  break;
+               case LIGHT_UV:
+                  bytes = UsbInstructionUtils.USB_CAMERA_LIGHT_UV();
+                  break;
+               case LIGHT_RGB:
+                  bytes = UsbInstructionUtils.USB_CAMERA_LIGHT_RGB();
+                  break;
+               case LIGHT_POLARIZED:
+                  bytes = UsbInstructionUtils.USB_CAMERA_LIGHT_POLARIZED();
+                  break;
+               case PRODUCT_CODE:
+                  bytes = UsbInstructionUtils.USB_CAMERA_PRODUCT_CODE();
+                  break;
+               case SYS_ONLINE:
+                  bytes = UsbInstructionUtils.USB_CAMERA_SYS_ONLINE();
+                  break;
+               case MOISTURE:
+                  bytes = currentMode==MODE_AUTO?
+                          UsbInstructionUtils.USB_CAMERA_WATER():
+                          UsbInstructionUtils.USB_CAMERA_WATER_SINGLE_MODE();
+                  break;
             }
 
-            @Override
-            public void onSuccess(Integer result) {
-               if (result==-1){
-                  if (cameraConfig.getOnMoistureListener()!=null)cameraConfig.getOnMoistureListener().onMoistureCallBack(result);
+            if (count!=0){
+               //LogUtils.e("send count "+count);
+               for (int i = 0; i < count; i++) {
+                  boolean state = sendInstruction(bytes);
+                  //LogUtils.e("count "+i + "  "+state);
+                  if (state){
+                     break;
+                  }
                }
+            }else {
+               sendInstruction(bytes);
             }
-         });
+            return 0;
+         }
+
+         @Override
+         public void onSuccess(Integer result) {
+            //-1 就是没有获取电阻的设备
+            if (result==-1){
+               if (cameraConfig.getOnMoistureListener()!=null)cameraConfig.getOnMoistureListener().onMoistureCallBack(result);
+            }
+         }
+      });
    }
+
 
    private boolean sendInstruction(byte [] data){
       return sendInstruction(data,DEFAULT_TIMEOUT);

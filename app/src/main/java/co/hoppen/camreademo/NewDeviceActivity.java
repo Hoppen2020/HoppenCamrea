@@ -30,7 +30,6 @@ import co.hoppen.cameralib.Instruction;
 public class NewDeviceActivity extends AppCompatActivity implements OnMoistureListener, IButtonCallback, OnDeviceListener, OnInfoListener {
    private HoppenController controller;
 
-
    @Override
    protected void onCreate(@Nullable Bundle savedInstanceState) {
       super.onCreate(savedInstanceState);
@@ -56,7 +55,6 @@ public class NewDeviceActivity extends AppCompatActivity implements OnMoistureLi
          startActivity(new Intent(NewDeviceActivity.this,MainActivity.class));
          finish();
       });
-
    }
 
    public void onClick(View view){

@@ -544,14 +544,18 @@ public final class DeviceFilter {
 
 	@Override
 	public String toString() {
-		return "DeviceFilter[mVendorId=" + mVendorId + ",mProductId="
-			+ mProductId + ",mClass=" + mClass + ",mSubclass=" + mSubclass
-			+ ",mProtocol=" + mProtocol
-			+ ",mManufacturerName=" + mManufacturerName
-			+ ",mProductName=" + mProductName
-			+ ",mSerialNumber=" + mSerialNumber
-			+ ",isExclude=" + isExclude
-			+ "]";
+		return "DeviceFilter{" +
+				"mVendorId=" + mVendorId +
+				", mProductId=" + mProductId +
+				", mClass=" + mClass +
+				", mSubclass=" + mSubclass +
+				", mProtocol=" + mProtocol +
+				", mManufacturerName='" + mManufacturerName + '\'' +
+				", mProductName='" + mProductName + '\'' +
+				", mSerialNumber='" + mSerialNumber + '\'' +
+				", isExclude=" + isExclude +
+				", type=" + type +
+				", detectType=" + detectType +
+				'}';
 	}
-
 }

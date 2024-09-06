@@ -4,8 +4,11 @@ import android.content.Intent;
 import android.content.res.AssetManager;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.graphics.Matrix;
 import android.os.Bundle;
 import android.os.Environment;
+import android.util.DisplayMetrics;
+import android.util.Log;
 import android.view.View;
 import android.widget.ImageView;
 import android.widget.Toast;
@@ -20,6 +23,7 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 
+import co.hoppen.cameralib.CallBack.OnMoistureListener;
 import co.hoppen.cameralib.HoppenCamera;
 import co.hoppen.cameralib.HoppenController;
 import co.hoppen.cameralib.CallBack.OnDeviceListener;
@@ -28,7 +32,7 @@ import co.hoppen.cameralib.widget.UVCCameraTextureView;
 /**
  * Created by YangJianHui on 2022/2/24.
  */
-public class FaceActivity extends BaseActivity implements OnDeviceListener, View.OnLongClickListener {
+public class FaceActivity extends BaseActivity implements OnDeviceListener, View.OnLongClickListener, OnMoistureListener {
    private ImageView faceView;
    private UVCCameraTextureView textureView;
    private HoppenController hoppenController;
@@ -50,13 +54,18 @@ public class FaceActivity extends BaseActivity implements OnDeviceListener, View
         textureView = findViewById(R.id.tv_camera);
         textureView.setBitmapSize(1920,1080);
         faceView = findViewById(R.id.iv_face);
+
 //      Matrix matrix = new Matrix();
 //      DisplayMetrics dm = getResources().getDisplayMetrics();
 //      int w_screen = dm.widthPixels;
 //      int h_screen = dm.heightPixels;
 //      matrix.postScale(-1, 1, w_screen/2, h_screen / 2);//镜像水平翻转
 //      textureView.setTransform(matrix);
-      hoppenController = new HoppenCamera.Builder(textureView).build();
+
+      hoppenController = new HoppenCamera.Builder(textureView)
+              .setOnMoistureListener(this)
+              .setFaceLightCount(HoppenCamera.FaceLightCount.THREE)
+              .build();
       faceView.setOnLongClickListener(this);
    }
 
@@ -96,8 +105,9 @@ public class FaceActivity extends BaseActivity implements OnDeviceListener, View
 
    public void t(View view){
       //hoppenController.closeDevices();
-      startActivity(new Intent(this,NullActivity.class));
-      finish();
+//      startActivity(new Intent(this,NullActivity.class));
+//      finish();
+      hoppenController.getMoisture();
    }
 
    private Bitmap getImageFromAssetsFile(String fileName) {
@@ -146,4 +156,14 @@ public class FaceActivity extends BaseActivity implements OnDeviceListener, View
       Toast.makeText(this,"保存成功",Toast.LENGTH_SHORT).show();
    }
 
+   @Override
+   public void onMoistureCallBack(float value) {
+      Log.e("XXXXXXXXXXXX",value+"");
+      runOnUiThread(new Runnable() {
+         @Override
+         public void run() {
+            Toast.makeText(FaceActivity.this,""+value,Toast.LENGTH_SHORT).show();
+         }
+      });
+   }
 }

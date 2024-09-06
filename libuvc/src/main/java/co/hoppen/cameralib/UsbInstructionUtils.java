@@ -1,5 +1,7 @@
 package co.hoppen.cameralib;
 
+import co.hoppen.cameralib.compatible.SpecialUsbTag;
+
 /**
  * Created by Administrator on 2018/4/4.
  */
@@ -19,8 +21,12 @@ public class UsbInstructionUtils {
      * @return
      */
     public static byte[] USB_CAMERA_WATER() {
-        byte [] data = {(byte) 0xAA, (byte) 0x10, (byte) 0x02, (byte) 0x00, (byte) 0x00};
-        return encryption(data);
+        if (SpecialUsbTag.isOldUsbFace()){
+            return OLD_USB_CAMERA_WATER();
+        }else {
+            byte [] data = {(byte) 0xAA, (byte) 0x10, (byte) 0x02, (byte) 0x00, (byte) 0x00};
+            return encryption(data);
+        }
     }
     /**
      * 指令：获取水份值
@@ -36,16 +42,24 @@ public class UsbInstructionUtils {
      * @return
      */
     public static byte[] USB_CAMERA_LIGHT_RGB() {
-        byte [] data = {(byte) 0xAA, (byte) 0x10, (byte) 0x03, (byte) 0x00, (byte) 0x00};
-        return encryption(data);
+        if (SpecialUsbTag.isOldUsbFace()){
+            return OLD_USB_CAMERA_LIGHT_RGB();
+        }else {
+            byte [] data = {(byte) 0xAA, (byte) 0x10, (byte) 0x03, (byte) 0x00, (byte) 0x00};
+            return encryption(data);
+        }
     }
     /**
      * 指令：偏振灯光
      * @return
      */
     public static byte[] USB_CAMERA_LIGHT_POLARIZED() {
-        byte [] data = {(byte) 0xAA, (byte) 0x10, (byte) 0x04, (byte) 0x00, (byte) 0x00};
-        return encryption(data);
+        if (SpecialUsbTag.isOldUsbFace()){
+            return OLD_USB_CAMERA_LIGHT_POLARIZED();
+        }else {
+            byte [] data = {(byte) 0xAA, (byte) 0x10, (byte) 0x04, (byte) 0x00, (byte) 0x00};
+            return encryption(data);
+        }
     }
 
     /**
@@ -53,8 +67,12 @@ public class UsbInstructionUtils {
      * @return
      */
     public static byte[] USB_CAMERA_LIGHT_UV() {
-        byte [] data =  {(byte) 0xAA, (byte) 0x10, (byte) 0x05, (byte) 0x00, (byte) 0x00};
-        return encryption(data);
+        if (SpecialUsbTag.isOldUsbFace()){
+            return OLD_USB_CAMERA_LIGHT_UV();
+        }else {
+            byte [] data =  {(byte) 0xAA, (byte) 0x10, (byte) 0x05, (byte) 0x00, (byte) 0x00};
+            return encryption(data);
+        }
     }
 
     /**
@@ -62,8 +80,12 @@ public class UsbInstructionUtils {
      * @return
      */
     public static byte[] USB_CAMERA_LIGHT_CLOSE() {
-        byte [] data =  {(byte) 0xAA, (byte) 0x10, (byte) 0x07, (byte) 0x00, (byte) 0x00};
-        return encryption(data);
+        if (SpecialUsbTag.isOldUsbFace()){
+            return OLD_USB_CAMERA_LIGHT_CLOSE();
+        }else {
+            byte [] data =  {(byte) 0xAA, (byte) 0x10, (byte) 0x07, (byte) 0x00, (byte) 0x00};
+            return encryption(data);
+        }
     }
 
     /**
@@ -75,6 +97,30 @@ public class UsbInstructionUtils {
         return encryption(data);
     }
 
+    private static byte[] OLD_USB_CAMERA_LIGHT_RGB() {
+        byte [] data = {(byte) 0xAA, (byte) 0x10, (byte) 0x02, (byte) 0x00, (byte) 0x00};
+        return encryption(data);
+    }
+
+    private static byte[] OLD_USB_CAMERA_LIGHT_POLARIZED() {
+        byte [] data = {(byte) 0xAA, (byte) 0x10, (byte) 0x04, (byte) 0x00, (byte) 0x00};
+        return encryption(data);
+    }
+
+    private static byte[] OLD_USB_CAMERA_LIGHT_UV() {
+        byte [] data =  {(byte) 0xAA, (byte) 0x10, (byte) 0x03, (byte) 0x00, (byte) 0x00};
+        return encryption(data);
+    }
+
+    private static byte[] OLD_USB_CAMERA_LIGHT_CLOSE() {
+        byte [] data =  {(byte) 0xAA, (byte) 0x10, (byte) 0x06, (byte) 0x00, (byte) 0x00};
+        return encryption(data);
+    }
+
+    private static byte[] OLD_USB_CAMERA_WATER() {
+        byte [] data = {(byte) 0xAA, (byte) 0x10, (byte) 0x08, (byte) 0x00, (byte) 0x00};
+        return encryption(data);
+    }
 
     private static byte[] encryption(byte[] data) {
         byte[] returnData = new byte[data.length + 1];

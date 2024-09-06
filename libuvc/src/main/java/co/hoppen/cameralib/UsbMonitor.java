@@ -156,6 +156,7 @@ public class UsbMonitor{
             while (iterator.hasNext()){
                 UsbDevice next = iterator.next();
                 LogUtils.e("request devices pid:"+next.getProductId()+"  vid:"+next.getVendorId(),next.toString());
+
                 DeviceFilter hoppenDevice = deviceFilter(next);
                 if (hoppenDevice!=null){
                     LogUtils.e(next.toString());
@@ -176,8 +177,15 @@ public class UsbMonitor{
         for (DeviceFilter deviceFilter : filterList) {
             if (deviceFilter.mProductId == usbDevice.getProductId()
                     && deviceFilter.mVendorId == usbDevice.getVendorId()) {
+//                LogUtils.e(deviceFilter.toString());
                 if (deviceFilter.detectType == DetectType.NONE) {
-                    return deviceFilter;
+                    //只要功能摄像头的时候 去除所有mcu接入
+                    if (cameraFilter == CameraFilter.ONLY_FUNCTION_CAMERA
+                            && deviceFilter.type==DeviceType.MCU){
+                        return null;
+                    }else {
+                        return deviceFilter;
+                    }
                 } else {
                     if (cameraFilter == CameraFilter.ONLY_SKIN_CAMERA) {
                         if (deviceFilter.detectType == DetectType.SKIN && !DeviceConfig.getDeviceIsDetectHair(usbDevice.getProductName())) {
@@ -195,7 +203,12 @@ public class UsbMonitor{
                         if (deviceFilter.detectType == DetectType.EYE) {
                             return deviceFilter;
                         }
-                    } else return deviceFilter;
+                    } else if (cameraFilter == CameraFilter.ONLY_FUNCTION_CAMERA){
+                        if (deviceFilter.detectType == DetectType.FUNCTION){
+                            LogUtils.e(deviceFilter.toString());
+                            return deviceFilter;
+                        }
+                    }else return deviceFilter;
                 }
             }
         }
